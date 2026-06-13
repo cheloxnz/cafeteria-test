@@ -1125,6 +1125,43 @@
     }
     .sug-btn:hover { background: #DA9440; }
 
+    /* ── QR CARD ─────────────────────────────── */
+    .qr-card {
+      background: var(--blanco); border: 1.5px solid var(--borde); border-radius: 16px;
+      padding: 24px; display: flex; align-items: center; gap: 24px; margin-top: 20px;
+    }
+    .qr-img-wrap {
+      flex-shrink: 0; width: 120px; height: 120px; border-radius: 12px;
+      overflow: hidden; background: white; padding: 6px;
+      border: 1.5px solid var(--crema3);
+    }
+    .qr-img-wrap img { width: 100%; height: 100%; display: block; }
+    .qr-body { flex: 1; }
+    .qr-label {
+      font-size: 9px; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+    }
+    .qr-title {
+      font-family: var(--fd); font-size: 16px; color: var(--espresso);
+      line-height: 1.3; margin-bottom: 4px;
+    }
+    .qr-url { font-size: 11px; color: var(--muted); margin-bottom: 14px; word-break: break-all; }
+    .qr-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .qr-btn {
+      padding: 8px 14px; border-radius: 8px; font-family: var(--fb);
+      font-size: 11px; font-weight: 800; cursor: pointer;
+      border: 1.5px solid var(--borde); background: var(--blanco);
+      color: var(--espresso); transition: background .15s, border-color .15s;
+    }
+    .qr-btn:hover { background: var(--crema2); border-color: var(--cafe); }
+    .qr-btn.primary {
+      background: var(--espresso); color: white; border-color: var(--espresso);
+    }
+    .qr-btn.primary:hover { background: #2a1a0e; }
+    @media (max-width: 600px) {
+      .qr-card { flex-direction: column; align-items: flex-start; }
+    }
+
     /* ── FORMAT CARDS ────────────────────────── */
     .format-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
     @media (max-width: 600px) { .format-grid { grid-template-columns: repeat(2, 1fr); } }
@@ -1636,6 +1673,24 @@
           <button class="sug-btn" onclick="showTab('generator')">✦ Generar post ahora</button>
         </div>
       </div>
+
+      <!-- QR del menú -->
+      <div class="qr-card">
+        <div class="qr-img-wrap">
+          <img id="qrImg" src="" alt="QR Menú">
+        </div>
+        <div class="qr-body">
+          <div class="qr-label">Acceso al menú</div>
+          <div class="qr-title">QR para tus clientes</div>
+          <div class="qr-url" id="qrUrl">—</div>
+          <div class="qr-actions">
+            <button class="qr-btn primary" onclick="qrDownload()">↓ Descargar PNG</button>
+            <button class="qr-btn" onclick="qrPrint()">⎙ Imprimir</button>
+            <a class="qr-btn" id="qrLink" href="#" target="_blank">↗ Ver menú</a>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -2521,6 +2576,41 @@
     const sug   = feats[Math.floor(Math.random() * feats.length)] || PRODUCTS[0];
     document.getElementById('sugTitle').textContent = `¿Ya generaste contenido de ${sug.name}?`;
     document.getElementById('sugDesc').textContent  = `Es uno de tus productos más populares. Un post bien hecho puede traerte más pedidos esta semana.`;
+
+    // QR del menú
+    const menuUrl = `${location.origin}/menu`;
+    document.getElementById('qrUrl').textContent = menuUrl;
+    document.getElementById('qrLink').href = menuUrl;
+    const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(menuUrl)}&color=3d2b1f&bgcolor=faf9f6&margin=1`;
+    document.getElementById('qrImg').src = qrSrc;
+  }
+
+  function qrDownload() {
+    const menuUrl = `${location.origin}/menu`;
+    const src = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(menuUrl)}&color=3d2b1f&bgcolor=ffffff&margin=2`;
+    const a = document.createElement('a');
+    a.href = src;
+    a.download = 'qr-menu-lumina.png';
+    a.target = '_blank';
+    a.click();
+  }
+
+  function qrPrint() {
+    const menuUrl = `${location.origin}/menu`;
+    const src = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=${encodeURIComponent(menuUrl)}&color=3d2b1f&bgcolor=ffffff&margin=2`;
+    const w = window.open('', '_blank');
+    w.document.write(`<!DOCTYPE html><html><head><title>QR Menú · Café Lúmina</title>
+    <style>
+      body { margin:0; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; font-family:Georgia,serif; background:#fff; }
+      img { width:280px; height:280px; }
+      h2 { font-size:22px; margin:16px 0 4px; color:#3d2b1f; }
+      p { font-size:13px; color:#888; margin:0; }
+    </style></head><body>
+    <img src="${src}" onload="window.print()">
+    <h2>Café Lúmina</h2>
+    <p>Escaneá para ver el menú</p>
+    </body></html>`);
+    w.document.close();
   }
 
   const LOAD_STEPS = [
