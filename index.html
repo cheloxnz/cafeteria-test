@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <title>Café Lúmina — Menú</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --espresso:  #2A1C12;
+      --cafe:      #6B4A33;
+      --crema:     #F6EEE2;
+      --caramelo:  #C8843A;
+      --terracota: #B14B2E;
+      --oliva:     #6E7351;
+      --bg:        #EAE0D0;
+      --card:      #FFFCF6;
+      --text:      #2B1D14;
+      --muted:     #9A8268;
+      --border:    #E2D2B8;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Hanken Grotesk', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── LANGUAGE SELECTOR ──────────────────────── */
+    .lang-selector {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: #120A03;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 28px;
+      transition: opacity .35s ease;
+    }
+    .lang-selector.hiding { opacity: 0; pointer-events: none; }
+    .lang-selector.hidden { display: none; }
+
+    .ls-address {
+      font-size: 10.5px;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      color: #6B5040;
+      margin-bottom: 22px;
+      text-align: center;
+    }
+    .ls-deco { font-size: 34px; margin-bottom: 12px; opacity: .8; }
+    .ls-brand {
+      font-family: 'Instrument Serif', serif;
+      font-style: italic;
+      font-size: 52px;
+      color: #F8EFE2;
+      text-align: center;
+      line-height: .95;
+      margin-bottom: 9px;
+    }
+    .ls-tagline {
+      font-size: 11.5px;
+      color: #78604A;
+      letter-spacing: .07em;
+      text-align: center;
+      margin-bottom: 42px;
+    }
+    .ls-divider {
+      width: 100%; max-width: 320px;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 18px;
+    }
+    .ls-divider::before, .ls-divider::after {
+      content: ''; flex: 1; height: 1px; background: #261508;
+    }
+    .ls-divider-text {
+      font-size: 10px; letter-spacing: .18em;
+      text-transform: uppercase; color: #5A4030; white-space: nowrap;
+    }
+    .ls-btn {
+      width: 100%; max-width: 320px;
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px; border-radius: 14px;
+      border: none; cursor: pointer;
+      font-family: 'Hanken Grotesk', sans-serif;
+      transition: all .2s; text-align: left;
+      margin-bottom: 10px;
+    }
+    .ls-btn-es { background: #C8843A; }
+    .ls-btn-es:hover { background: #DA9440; transform: translateY(-1px); }
+    .ls-btn-en {
+      background: transparent;
+      border: 1.5px solid #2A1808;
+    }
+    .ls-btn-en:hover { border-color: #5A3A20; background: rgba(255,255,255,.03); transform: translateY(-1px); }
+    .ls-flag {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(0,0,0,.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; flex-shrink: 0;
+    }
+    .ls-btn-es .ls-flag { color: #2A1408; }
+    .ls-btn-en .ls-flag { color: #A08060; }
+    .ls-texts { flex: 1; }
+    .ls-btn-name {
+      display: block; font-size: 16px;
+      font-family: 'Instrument Serif', serif; font-style: italic;
+      line-height: 1.1;
+    }
+    .ls-btn-es .ls-btn-name { color: #1E0C04; }
+    .ls-btn-en .ls-btn-name { color: #F0E0D0; }
+    .ls-btn-sub { display: block; font-size: 11.5px; opacity: .65; margin-top: 2px; }
+    .ls-btn-es .ls-btn-sub { color: #3A1E08; opacity: .72; }
+    .ls-btn-en .ls-btn-sub { color: #A08060; }
+    .ls-arrow { font-size: 18px; opacity: .55; }
+    .ls-btn-es .ls-arrow { color: #1E0C04; }
+    .ls-btn-en .ls-arrow { color: #8A6A50; }
+
+    /* ── LAYOUT ─────────────────────────────── */
+    .layout { display: flex; height: 100vh; overflow: hidden; }
+
+    /* ── SIDEBAR ─────────────────────────────── */
+    .sidebar {
+      flex: 0 0 240px;
+      background: #241710;
+      color: #EFE2D2;
+      display: flex; flex-direction: column;
+      padding: 26px 18px; overflow-y: auto;
+    }
+    .sb-brand {
+      font-family: 'Instrument Serif', serif;
+      font-size: 26px; color: #FBF4E9;
+      line-height: 1; padding: 0 8px;
+      margin-bottom: 2px; white-space: nowrap;
+    }
+    .sb-address {
+      font-size: 10px; letter-spacing: .14em;
+      text-transform: uppercase; color: #7A6050;
+      padding: 0 8px; margin-bottom: 4px;
+    }
+    .sb-tag {
+      font-size: 11px; letter-spacing: .16em;
+      text-transform: uppercase; color: #A98C72;
+      padding: 0 8px; margin-bottom: 22px;
+    }
+    .sb-label {
+      font-size: 10.5px; letter-spacing: .18em;
+      text-transform: uppercase; color: #8C6F58;
+      padding: 14px 8px 7px;
+    }
+    .sb-btn {
+      display: flex; align-items: center; gap: 11px;
+      width: 100%; padding: 10px 12px; margin-bottom: 2px;
+      border: none; border-radius: 12px; background: transparent;
+      color: #C9B198; font-size: 14px; font-weight: 600;
+      font-family: 'Hanken Grotesk', system-ui, sans-serif;
+      cursor: pointer; text-align: left; transition: all .15s;
+    }
+    .sb-btn:hover  { background: rgba(255,255,255,.07); color: #EFE2D2; }
+    .sb-btn.active { background: rgba(255,255,255,.1);  color: #FBF4E9; }
+    .sb-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0; border: 1.5px solid #6B5040;
+      background: transparent; transition: all .15s;
+    }
+    .sb-btn.active .sb-dot { background: #C8843A; border-color: #C8843A; box-shadow: 0 0 0 3px rgba(200,132,58,.2); }
+    .sb-foot {
+      margin-top: auto; padding: 16px 8px 4px;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .sb-lang-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border: 1px solid #3A2416;
+      border-radius: 20px; background: transparent;
+      color: #A98C72; font-size: 11px; font-weight: 700;
+      font-family: inherit; cursor: pointer; margin-bottom: 12px;
+      letter-spacing: .06em; transition: all .15s;
+    }
+    .sb-lang-btn:hover { border-color: #6A4A30; color: #EFE2D2; }
+    .sb-admin {
+      display: block; font-size: 12px; color: #A98C72;
+      text-decoration: none; padding: 6px 4px; transition: color .15s;
+    }
+    .sb-admin:hover { color: #EFE2D2; }
+    .sb-hint { font-size: 11px; color: #7A6252; line-height: 1.5; margin-top: 8px; }
+
+    /* ── MAIN CONTENT ────────────────────────── */
+    .main-content { flex: 1; overflow-y: auto; min-width: 0; background: var(--crema); }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(120,90,60,.28); border-radius: 9px; }
+
+    @keyframes sheetUp  { from { transform: translateY(100%) } to { transform: none } }
+    @keyframes pulseDot { 0%,100% { opacity: .3 } 50% { opacity: 1 } }
+
+    /* ── HEADER ─────────────────────────────── */
+    .hdr { position: relative; height: 210px; overflow: hidden; }
+    .hdr-cover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .hdr-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(31,20,13,.45) 0%, rgba(31,20,13,.15) 38%, rgba(31,20,13,.82) 100%);
+    }
+    .hdr-inner {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      padding: 22px 22px 18px;
+    }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: rgba(110,115,81,.92); padding: 4px 11px;
+      border-radius: 30px; font-size: 11px; font-weight: 700;
+      letter-spacing: .04em; color: #FBF4E9; width: fit-content;
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #D6F5C8; box-shadow: 0 0 0 3px rgba(214,245,200,.25);
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+    .hdr-bottom { margin-top: auto; }
+    .hdr-title { font-family: 'Instrument Serif', serif; font-size: 42px; line-height: .98; color: #FBF4E9; }
+    .hdr-sub { font-size: 13px; color: #E7D6C2; margin-top: 4px; letter-spacing: .02em; }
+
+    /* ── CATEGORY NAV ───────────────────────── */
+    .cat-nav {
+      position: sticky; top: 0; z-index: 20;
+      background: rgba(246,238,226,.86);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(180,150,115,.22); padding: 11px 0;
+    }
+    .cat-scroll {
+      display: flex; gap: 8px; flex-wrap: wrap; padding: 4px 18px;
+    }
+    .cat-btn {
+      flex: 0 0 auto; padding: 7px 15px; border-radius: 30px;
+      border: 1px solid var(--border);
+      background: var(--card); color: var(--cafe);
+      font-family: inherit; font-size: 13px; font-weight: 700;
+      cursor: pointer; white-space: nowrap; transition: all .15s;
+    }
+    .cat-btn.active { background: var(--espresso); border-color: var(--espresso); color: #FBF4E9; }
+
+    /* ── FEATURED ───────────────────────────── */
+    .feat-hdr { display: flex; align-items: baseline; justify-content: space-between; padding: 18px 18px 11px; }
+    .feat-title { font-family: 'Instrument Serif', serif; font-size: 21px; color: #3A2719; }
+    .feat-label { font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; font-weight: 600; }
+    .feat-scroll { display: flex; gap: 13px; overflow-x: auto; padding: 0 18px 6px; scrollbar-width: none; }
+    .feat-scroll::-webkit-scrollbar { display: none; }
+    .feat-card {
+      flex: 0 0 168px; background: var(--card);
+      border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+      box-shadow: 0 10px 22px -14px rgba(90,60,35,.4); cursor: pointer;
+    }
+    .feat-card-img { position: relative; height: 120px; }
+    .feat-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .feat-badge {
+      position: absolute; top: 9px; left: 9px;
+      background: var(--caramelo); color: var(--espresso);
+      font-size: 10px; font-weight: 800; padding: 3px 8px;
+      border-radius: 20px; letter-spacing: .04em;
+    }
+    .feat-card-body { padding: 11px 12px 13px; }
+    .feat-name { font-weight: 700; font-size: 14px; color: var(--text); line-height: 1.15; }
+    .feat-desc { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.3; min-height: 30px; }
+    .feat-price { font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--terracota); margin-top: 4px; }
+
+    /* ── SECTIONS ───────────────────────────── */
+    .sec { padding: 14px 18px 6px; }
+    .sec-hdr { display: flex; align-items: center; gap: 11px; margin-bottom: 4px; }
+    .sec-title { font-family: 'Instrument Serif', serif; font-size: 25px; color: #3A2719; }
+    .sec-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+    /* ── PRODUCT ROWS ───────────────────────── */
+    .prow {
+      display: flex; gap: 13px; padding: 13px 0;
+      border-bottom: 1px solid #ECE0CE; align-items: flex-start;
+    }
+    .prow:last-child { border-bottom: none; }
+    .prow.soldout { opacity: .55; }
+    .prow-thumb-wrap { position: relative; flex: 0 0 auto; }
+    .prow-thumb {
+      width: 58px; height: 58px; border-radius: 13px;
+      object-fit: cover; display: block;
+      box-shadow: 0 4px 10px -6px rgba(90,60,35,.5); background: #EFE5D6;
+    }
+    .soldout .prow-thumb { filter: grayscale(.7); }
+    .soldout-badge {
+      position: absolute; inset: 0; background: rgba(43,29,20,.5);
+      border-radius: 13px; display: flex; align-items: center; justify-content: center;
+    }
+    .soldout-badge span { font-size: 8.5px; font-weight: 800; color: #fff; letter-spacing: .05em; transform: rotate(-8deg); }
+    .prow-info { flex: 1; min-width: 0; }
+    .prow-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+    .prow-name { font-weight: 700; font-size: 14.5px; color: var(--text); line-height: 1.2; }
+    .prow-price { font-family: 'Instrument Serif', serif; font-size: 18px; color: var(--cafe); white-space: nowrap; }
+    .prow-desc { font-size: 12px; color: var(--muted); line-height: 1.35; margin-top: 2px; }
+    .variant-btn {
+      display: inline-flex; align-items: center; gap: 5px; margin-top: 7px;
+      background: #F2E7D5; border: 1px solid #E2D2B8;
+      color: #8A5A33; font-size: 11.5px; font-weight: 700;
+      padding: 5px 11px; border-radius: 30px; cursor: pointer; font-family: inherit;
+    }
+
+    /* ── FOOTER ─────────────────────────────── */
+    .mfooter { text-align: center; padding: 22px 18px 36px; color: var(--muted); }
+    .mfooter-name { font-family: 'Instrument Serif', serif; font-size: 18px; color: #8A6F56; }
+    .mfooter-address { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: #A08068; margin-top: 3px; }
+    .mfooter-sub { font-size: 11px; letter-spacing: .06em; margin-top: 5px; }
+    .admin-link {
+      display: inline-block; margin-top: 14px; font-size: 12px;
+      color: var(--muted); text-decoration: none;
+      border: 1px solid var(--border); padding: 6px 14px; border-radius: 100px;
+    }
+    .footer-lang-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      margin-top: 10px; padding: 6px 14px;
+      border: 1px solid var(--border); border-radius: 100px;
+      background: transparent; font-family: inherit; font-size: 12px;
+      color: var(--muted); cursor: pointer; transition: all .15s;
+    }
+    .footer-lang-btn:hover { border-color: var(--cafe); color: var(--cafe); }
+
+    /* ── OVERLAY ────────────────────────────── */
+    .overlay { position: fixed; inset: 0; z-index: 40; background: rgba(31,20,13,.42); display: none; }
+    .overlay.open { display: block; }
+
+    /* ── BOTTOM SHEET ───────────────────────── */
+    .bsheet {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+      background: var(--card); border-radius: 26px 26px 38px 38px;
+      max-height: 82vh; overflow-y: auto;
+      transform: translateY(100%); transition: transform .32s cubic-bezier(.2,.9,.3,1);
+      box-shadow: 0 -16px 40px -12px rgba(40,25,15,.4);
+      max-width: 560px; margin: 0 auto;
+    }
+    .bsheet.open { transform: translateY(0); }
+    .sheet-handle { width: 42px; height: 5px; background: #E0D0B8; border-radius: 10px; margin: 6px auto 14px; }
+    .sheet-hdr { padding: 0 22px 6px; display: flex; gap: 13px; align-items: center; }
+    .sheet-img { width: 62px; height: 62px; border-radius: 15px; object-fit: cover; }
+    .sheet-meta { flex: 1; }
+    .sheet-name { font-weight: 800; font-size: 18px; color: var(--text); }
+    .sheet-price { font-family: 'Instrument Serif', serif; font-size: 20px; color: var(--terracota); }
+    .sheet-close {
+      width: 34px; height: 34px; border-radius: 50%; border: none;
+      background: #F2E7D5; color: #8A5A33; font-size: 17px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .sheet-desc { font-size: 12.5px; color: var(--muted); line-height: 1.4; padding: 0 22px 14px; }
+    .sheet-vl { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 700; padding: 6px 22px 9px; }
+    .sheet-variants { padding: 0 22px 26px; display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
+    .v-opt {
+      display: flex; align-items: center; gap: 11px; width: 100%;
+      padding: 13px 15px; border: 1.5px solid #EADCC6; border-radius: 14px;
+      background: var(--card); cursor: pointer; font-family: inherit;
+      transition: border-color .15s, background .15s;
+    }
+    .v-opt.active { border-color: var(--caramelo); background: #FBF1E1; }
+    .v-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #D8C4A6; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; }
+    .v-opt.active .v-radio { border-color: var(--caramelo); }
+    .v-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--caramelo); opacity: 0; }
+    .v-opt.active .v-dot { opacity: 1; }
+    .v-name { flex: 1; text-align: left; font-weight: 600; font-size: 14px; color: var(--text); }
+    .v-price { font-size: 13px; color: var(--muted); }
+
+    /* ── CATALOG GRID ───────────────────────── */
+    .catalog-grid { display: flex; flex-direction: column; }
+
+    /* ── DESKTOP ─────────────────────────────── */
+    @media (min-width: 640px) {
+      .cat-nav { display: none; }
+      .hdr { height: 220px; }
+      .hdr-bottom { display: none; }
+      .feat-hdr { padding: 22px 28px 13px; }
+      .feat-scroll { padding: 0 28px 8px; }
+      .feat-card { flex: 0 0 210px; }
+      .feat-card-img { height: 140px; }
+      .sec { padding: 18px 28px 8px; }
+      .catalog-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+      .mfooter { padding: 28px 28px 48px; }
+      .bsheet { max-width: 560px; }
+    }
+
+    /* ── MOBILE ──────────────────────────────── */
+    @media (max-width: 639px) {
+      .layout { display: block; height: auto; overflow: visible; }
+      .sidebar { display: none; }
+      .main-content { overflow: visible; }
+      .cat-nav { display: block; }
+      .cat-scroll { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+      .cat-scroll::-webkit-scrollbar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LANGUAGE SELECTOR ═════════════════════════ -->
+<div class="lang-selector" id="langSelector">
+  <div class="ls-address" id="lsAddress">Tu Ciudad · País</div>
+  <div class="ls-deco">☕</div>
+  <div class="ls-brand" id="lsBrand">Café Lúmina</div>
+  <div class="ls-tagline" id="lsTagline">Café de especialidad · Panadería artesanal</div>
+  <div class="ls-divider">
+    <span class="ls-divider-text">Elige tu idioma</span>
+  </div>
+  <button class="ls-btn ls-btn-es" onclick="selectLang('es')">
+    <span class="ls-flag">Es</span>
+    <div class="ls-texts">
+      <span class="ls-btn-name">Español</span>
+      <span class="ls-btn-sub">Continuar en español</span>
+    </div>
+    <span class="ls-arrow">→</span>
+  </button>
+  <button class="ls-btn ls-btn-en" onclick="selectLang('en')">
+    <span class="ls-flag">En</span>
+    <div class="ls-texts">
+      <span class="ls-btn-name">English</span>
+      <span class="ls-btn-sub">Continue in English</span>
+    </div>
+    <span class="ls-arrow">→</span>
+  </button>
+</div>
+
+<!-- ══ APP ══════════════════════════════════════ -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand" id="sbBrand">Café Lúmina</div>
+    <div class="sb-address" id="sbAddress"></div>
+    <div class="sb-tag" id="sbTag">Menú digital</div>
+    <div class="sb-label" id="sbCatsLabel">Categorías</div>
+    <nav id="sbNav"></nav>
+    <div class="sb-foot">
+      <button class="sb-lang-btn" id="sbLangBtn" onclick="showLangSelector()">🌐 EN</button>
+      <a class="sb-admin" id="sbAdminLink" href="admin.html">🔑 Área privada</a>
+      <p class="sb-hint">Sistema base, adaptable a cualquier cafetería.</p>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <header class="hdr">
+      <img id="coverImg" class="hdr-cover" src="" alt="">
+      <div class="hdr-overlay"></div>
+      <div class="hdr-inner">
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span id="statusText">Abierto · cierra 20:00</span>
+        </div>
+        <div class="hdr-bottom">
+          <h1 class="hdr-title" id="hdrTitle">Café Lúmina</h1>
+          <p class="hdr-sub" id="hdrSub">Café de especialidad · Panadería artesanal</p>
+        </div>
+      </div>
+    </header>
+
+    <nav class="cat-nav">
+      <div class="cat-scroll" id="catScroll"></div>
+    </nav>
+
+    <div id="top">
+      <div class="feat-hdr">
+        <span class="feat-title" id="featTitle">Lo más pedido</span>
+        <span class="feat-label" id="featLabel">Destacados</span>
+      </div>
+      <div class="feat-scroll" id="featScroll"></div>
+    </div>
+
+    <div id="catalog"></div>
+
+    <footer class="mfooter">
+      <div class="mfooter-name" id="footerName">Café Lúmina</div>
+      <div class="mfooter-address" id="footerAddress"></div>
+      <div class="mfooter-sub" id="footerSub">Gracias por tu visita ☕</div>
+      <button class="footer-lang-btn" onclick="showLangSelector()" id="footerLangBtn">🌐 EN</button>
+    </footer>
+
+  </main>
+</div>
+
+<!-- OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+
+<!-- BOTTOM SHEET -->
+<div class="bsheet" id="bsheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-hdr">
+    <img class="sheet-img" id="sheetImg" src="" alt="">
+    <div class="sheet-meta">
+      <div class="sheet-name" id="sheetName"></div>
+      <div class="sheet-price" id="sheetPrice"></div>
+    </div>
+    <button class="sheet-close" onclick="closeSheet()">✕</button>
+  </div>
+  <div class="sheet-desc" id="sheetDesc"></div>
+  <div class="sheet-vl" id="sheetVl">Elegí tu variante</div>
+  <div class="sheet-variants" id="sheetVariants"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURACIÓN — completá con tu URL de Convex cuando esté listo
+// ═══════════════════════════════════════════════════════════════
+const CONVEX_URL = 'http://127.0.0.1:3211'; // Local dev — reemplazar por la URL de producción al hacer deploy
+
+// ═══════════════════════════════════════════════════════════════
+// IMAGEN (Supabase Storage / loremflickr)
+// ═══════════════════════════════════════════════════════════════
+const IMG = {
+  enabled: false,
+  url: 'https://TU-PROYECTO.supabase.co',
+  bucket: 'productos',
+  get(id, kw, lock, w, h) {
+    if (this.enabled) return `${this.url}/storage/v1/object/public/${this.bucket}/${id}.jpg`;
+    return `https://loremflickr.com/${w}/${h}/${encodeURIComponent(kw)}?lock=${lock}`;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SETTINGS (sobrescritos por Convex si está configurado)
+// ═══════════════════════════════════════════════════════════════
+const SETTINGS = {
+  brandName:   'Café Lúmina',
+  brandNameEn: 'Café Lúmina',
+  address:     '',
+  addressEn:   '',
+  tagline:     'Café de especialidad · Panadería artesanal',
+  taglineEn:   'Specialty coffee · Artisan bakery',
+  openText:    'Abierto · cierra 20:00',
+  openTextEn:  'Open · closes 8:00 PM',
+};
+
+// ═══════════════════════════════════════════════════════════════
+// TRADUCCIONES
+// ═══════════════════════════════════════════════════════════════
+const T = {
+  es: {
+    sidebarTag: 'Menú digital', sidebarCats: 'Categorías',
+    sidebarAdmin: '🔑 Área privada', langSwitch: '🌐 EN',
+    featured: 'Lo más pedido', featLabel: 'Destacados',
+    soldOut: 'AGOTADO', badge: '★ Destacado',
+    options: 'opciones', chooseVariant: 'Elegí tu variante',
+    footerSub: 'Gracias por tu visita ☕', langBtn: '🌐 EN',
+    menuTitle: 'Menú',
+  },
+  en: {
+    sidebarTag: 'Digital menu', sidebarCats: 'Categories',
+    sidebarAdmin: '🔑 Private area', langSwitch: '🌐 ES',
+    featured: 'Most ordered', featLabel: 'Featured',
+    soldOut: 'SOLD OUT', badge: '★ Featured',
+    options: 'options', chooseVariant: 'Choose your option',
+    footerSub: 'Thank you for your visit ☕', langBtn: '🌐 ES',
+    menuTitle: 'Menu',
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// CATÁLOGO
+// ═══════════════════════════════════════════════════════════════
+const CATALOG = [
+  { id: 'cafes', name: 'Cafés', nameEn: 'Coffees', items: [
+    { id: 'cafe-chico',   name: 'Café chico',              nameEn: 'Small coffee',          price: 2000, kw: 'espresso,coffee',   lock: 101 },
+    { id: 'cafe-jarrita', name: 'Café en jarrita',          nameEn: 'Coffee pitcher',        price: 2200, kw: 'coffee,cup',         lock: 102 },
+    { id: 'cafe-xl',      name: 'Café XL',                 nameEn: 'XL Coffee',             price: 4000, kw: 'coffee,mug',          lock: 103 },
+    { id: 'cafe-leche',   name: 'Café con leche · Lágrima', nameEn: 'Coffee with milk',      price: 2400, kw: 'latte,coffee',        lock: 104 },
+  ]},
+  { id: 'especiales', name: 'Cafés Especiales', nameEn: 'Specialty Coffees', items: [
+    { id: 'latte', name: 'Latte de autor', nameEn: 'Signature Latte', price: 5000, kw: 'latte,art', lock: 110, badge: true,
+      desc: 'Base de latte combinada con la salsa de tu elección.',
+      descEn: 'Latte base combined with your choice of sauce.',
+      variants: ['Pistacho','Caramelo','Vainilla','Chocolate','Dulce de leche','Frutilla','Chocolate blanco'],
+      variantsEn: ['Pistachio','Caramel','Vanilla','Chocolate','Dulce de leche','Strawberry','White chocolate'] },
+  ]},
+  { id: 'infusiones', name: 'Infusiones', nameEn: 'Herbal Teas', items: [
+    { id: 'infusion', name: 'Infusión', nameEn: 'Herbal Tea', price: 2400, kw: 'tea,cup', lock: 120,
+      variants: ['Clásico','Verde','Manzanilla','Hierbas','Mate cocido'],
+      variantsEn: ['Classic','Green','Chamomile','Herbs','Mate'] },
+  ]},
+  { id: 'bebidas', name: 'Bebidas', nameEn: 'Drinks', items: [
+    { id: 'remo',        name: 'Remo',                  nameEn: 'Lemonade',           price: 3500, kw: 'lemonade,drink',  lock: 130 },
+    { id: 'jugo',        name: 'Exprimido de naranja',  nameEn: 'Fresh Orange Juice', price: 3500, kw: 'orange,juice',    lock: 131 },
+    { id: 'gaseosas',    name: 'Gaseosas',              nameEn: 'Soft Drinks',        price: 2500, kw: 'soda,glass',      lock: 132 },
+    { id: 'agua',        name: 'Agua mineral',          nameEn: 'Still Water',        price: 1200, kw: 'water,bottle',    lock: 133 },
+    { id: 'agua-gas',    name: 'Agua con gas',          nameEn: 'Sparkling Water',    price: 1200, kw: 'sparkling,water', lock: 134 },
+    { id: 'agua-sab',    name: 'Agua saborizada',       nameEn: 'Flavored Water',     price: 2500, kw: 'flavored,water',  lock: 135 },
+    { id: 'baggio',      name: 'Jugo Baggio',           nameEn: 'Baggio Juice',       price: 2000, kw: 'juice',           lock: 136 },
+    { id: 'nesquik',     name: 'Nesquik',               nameEn: 'Nesquik',            price: 2000, kw: 'chocolate,milk',  lock: 137, soldOut: true },
+    { id: 'chocolatada', name: 'Chocolatada',           nameEn: 'Chocolate Milk',     price: 2500, kw: 'chocolate,drink', lock: 138 },
+  ]},
+  { id: 'promos', name: 'Promos', nameEn: 'Combos', items: [
+    { id: 'promo1', name: 'Promo 1 · Infusión + 2 medialunas',     nameEn: 'Combo 1 · Tea + 2 croissants',      price: 3500, kw: 'coffee,croissant', lock: 141, badge: true },
+    { id: 'promo2', name: 'Promo 2 · Infusión + 2 tostadas',       nameEn: 'Combo 2 · Tea + 2 toasts',         price: 4500, kw: 'toast,breakfast',  lock: 142,
+      desc: 'Pan de campo o integral, queso y mermelada o miel.',
+      descEn: 'Country or whole wheat bread, cheese and jam or honey.' },
+    { id: 'promo3', name: 'Promo 3 · Infusión + porción de torta', nameEn: 'Combo 3 · Tea + cake slice',        price: 7000, kw: 'cake,coffee',      lock: 143 },
+    { id: 'promo4', name: 'Promo 4 · Infusión + medio tostado',    nameEn: 'Combo 4 · Tea + half sandwich',    price: 6500, kw: 'sandwich,toast',   lock: 144 },
+    { id: 'promo5', name: 'Promo 5 · Infusión + tostado',          nameEn: 'Combo 5 · Tea + full sandwich',    price: 7000, kw: 'grilled,sandwich', lock: 145 },
+    { id: 'promo6', name: 'Promo 6 · Remo + 2 churros',            nameEn: 'Combo 6 · Lemonade + 2 churros',   price: 3500, kw: 'churros',          lock: 146 },
+  ]},
+  { id: 'panaderia', name: 'Panadería', nameEn: 'Bakery', items: [
+    { id: 'medialunas', name: 'Medialunas',            nameEn: 'Croissants',            price:  900, kw: 'croissant',        lock: 150 },
+    { id: 'med-jq',     name: 'Medialunas con J&Q',   nameEn: 'Ham & Cheese Croissants',price: 2000, kw: 'croissant,ham',    lock: 151 },
+    { id: 'bizcochos',  name: 'Bizcochos',             nameEn: 'Biscuits',              price:  900, kw: 'pastry,bakery',    lock: 152 },
+    { id: 'croissant',  name: 'Croissant',             nameEn: 'Croissant',             price: 1500, kw: 'croissant,butter', lock: 153 },
+    { id: 'avocado',    name: 'Avocado Toast',         nameEn: 'Avocado Toast',         price: 7500, kw: 'avocado,toast',    lock: 154, badge: true,
+      desc: 'Queso crema, palta y huevos revueltos.',
+      descEn: 'Cream cheese, avocado and scrambled eggs.' },
+    { id: 'tostado',    name: 'Tostado (8 porciones)', nameEn: 'Toasted Sandwich (8)',  price: 9000, kw: 'toasted,sandwich', lock: 155 },
+    { id: 'donas',      name: 'Donas',                 nameEn: 'Donuts',                price: 2500, kw: 'donut',            lock: 156 },
+    { id: 'chipacitos', name: 'Chipacitos (6u)',        nameEn: 'Cheese Buns (6 pcs)',   price: 3300, kw: 'cheese,bread',     lock: 157 },
+    { id: 'scone',      name: 'Scone de queso',        nameEn: 'Cheese Scone',          price: 2500, kw: 'scone',            lock: 158 },
+    { id: 'roll',       name: 'Roll de canela',        nameEn: 'Cinnamon Roll',         price: 4000, kw: 'cinnamon,roll',    lock: 159 },
+    { id: 'budin',      name: 'Budín de chocolate',    nameEn: 'Chocolate Loaf',        price: 3000, kw: 'chocolate,cake',   lock: 160 },
+    { id: 'muffins',    name: 'Muffins',               nameEn: 'Muffins',               price: 2500, kw: 'muffin',           lock: 161,
+      variants: ['Vainilla','Chocolate'], variantsEn: ['Vanilla','Chocolate'] },
+  ]},
+  { id: 'pasteleria', name: 'Pastelería', nameEn: 'Pastries', items: [
+    { id: 'churros',   name: 'Churros',         nameEn: 'Churros',        price: 1000, unit: 'c/u', kw: 'churros',          lock: 170,
+      variants: ['Vainilla','Chocolate'], variantsEn: ['Vanilla','Chocolate'] },
+    { id: 'cookies',   name: 'Cookies',         nameEn: 'Cookies',        price: 3000, kw: 'cookies',           lock: 171 },
+    { id: 'postres',   name: 'Postres en vaso', nameEn: 'Cup Desserts',   price: 4000, kw: 'dessert,cup',        lock: 172,
+      desc: '200cc $4.000 · 350cc $4.700', descEn: '200cc $4,000 · 350cc $4,700',
+      variants: ['Chocotorta','Oreo','Bon o Bon','Nutella'], variantsEn: ['Chocotorta','Oreo','Bon o Bon','Nutella'] },
+    { id: 'alfajores', name: 'Alfajores',        nameEn: 'Alfajores',      price: 2500, kw: 'cookie,dessert',    lock: 173, badge: true,
+      desc: 'Artesanales, 5 sabores.', descEn: 'Homemade, 5 flavors.',
+      variants: ['Nutella','Pistacho','Maizena','Rogel','Almendras'],
+      variantsEn: ['Nutella','Pistachio','Cornstarch','Rogel','Almonds'] },
+    { id: 'brownies',  name: 'Brownies',         nameEn: 'Brownies',       price: 3000, kw: 'brownie,chocolate', lock: 174,
+      variants: ['Oreo','Nueces'], variantsEn: ['Oreo','Walnuts'] },
+    { id: 'tortas',    name: 'Tortas (porción)', nameEn: 'Cake (slice)',   price: 3000, kw: 'cake,slice',        lock: 175,
+      desc: 'Degustación que varía cada semana.', descEn: 'Rotating selection each week.' },
+  ]},
+];
+
+const FEATURED_IDS = ['latte', 'avocado', 'alfajores'];
+
+// ═══════════════════════════════════════════════════════════════
+// IDIOMA
+// ═══════════════════════════════════════════════════════════════
+let currentLang = localStorage.getItem('lang');
+
+function selectLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('lang', lang);
+  const sel = document.getElementById('langSelector');
+  sel.classList.add('hiding');
+  setTimeout(() => sel.classList.add('hidden'), 370);
+  document.documentElement.lang = lang;
+  applyLang();
+}
+
+function showLangSelector() {
+  const sel = document.getElementById('langSelector');
+  sel.classList.remove('hidden', 'hiding');
+}
+
+function applyLang() {
+  const lang = currentLang || 'es';
+  const Tr   = T[lang];
+  const S    = SETTINGS;
+
+  const brandName = lang === 'en' ? (S.brandNameEn || S.brandName) : S.brandName;
+  const address   = lang === 'en' ? (S.addressEn   || S.address)   : S.address;
+  const tagline   = lang === 'en' ? (S.taglineEn   || S.tagline)   : S.tagline;
+  const openText  = lang === 'en' ? (S.openTextEn  || S.openText)  : S.openText;
+
+  // Selector
+  document.getElementById('lsBrand').textContent   = brandName;
+  document.getElementById('lsAddress').textContent = address || (lang === 'en' ? 'Your City · Country' : 'Tu Ciudad · País');
+  document.getElementById('lsTagline').textContent = tagline;
+
+  // Sidebar
+  document.getElementById('sbBrand').textContent   = brandName;
+  document.getElementById('sbAddress').textContent = address;
+  document.getElementById('sbAddress').style.display = address ? '' : 'none';
+  document.getElementById('sbTag').textContent     = Tr.sidebarTag;
+  document.getElementById('sbCatsLabel').textContent = Tr.sidebarCats;
+  document.getElementById('sbAdminLink').textContent = Tr.sidebarAdmin;
+  document.getElementById('sbLangBtn').textContent  = Tr.langSwitch;
+
+  // Header
+  document.getElementById('statusText').textContent = openText;
+  document.getElementById('hdrTitle').textContent   = brandName;
+  document.getElementById('hdrSub').textContent     = tagline;
+
+  // Featured
+  document.getElementById('featTitle').textContent = Tr.featured;
+  document.getElementById('featLabel').textContent = Tr.featLabel;
+
+  // Footer
+  document.getElementById('footerName').textContent    = brandName;
+  document.getElementById('footerAddress').textContent = address;
+  document.getElementById('footerAddress').style.display = address ? '' : 'none';
+  document.getElementById('footerSub').textContent     = Tr.footerSub;
+  document.getElementById('footerLangBtn').textContent = Tr.langBtn;
+
+  // Sheet
+  document.getElementById('sheetVl').textContent = Tr.chooseVariant;
+
+  // Page title
+  document.title = `${brandName} — ${Tr.menuTitle}`;
+
+  // Rebuild dynamic sections
+  document.getElementById('catScroll').innerHTML = '';
+  document.getElementById('sbNav').innerHTML     = '';
+  document.getElementById('featScroll').innerHTML = '';
+  document.getElementById('catalog').innerHTML   = '';
+  buildCatNav();
+  buildFeatured();
+  buildCatalog();
+  setupObserver();
+  filterCat('todo');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONVEX — cargar settings al inicio
+// ═══════════════════════════════════════════════════════════════
+async function loadSettings() {
+  if (!CONVEX_URL) return;
+  try {
+    const res  = await fetch(`${CONVEX_URL}/api/settings`);
+    const data = await res.json();
+    Object.keys(SETTINGS).forEach(k => { if (data[k]) SETTINGS[k] = data[k]; });
+  } catch(e) {
+    console.warn('Convex no disponible, usando configuración local');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════
+function money(price, unit) {
+  return '$' + Number(price).toLocaleString('es-AR') + (unit ? ` ${unit}` : '');
+}
+function flat() {
+  return CATALOG.flatMap(c => c.items.map(it => ({ ...it, catName: c.name, catNameEn: c.nameEn })));
+}
+function find(id) { return flat().find(x => x.id === id); }
+function ph() {
+  return "data:image/svg+xml," + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">' +
+    '<rect width="100" height="100" fill="#EFE5D6"/>' +
+    '<circle cx="50" cy="42" r="16" fill="none" stroke="#C9B492" stroke-width="2.5"/>' +
+    '</svg>'
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BUILD DOM
+// ═══════════════════════════════════════════════════════════════
+function buildCatNav() {
+  const scroll = document.getElementById('catScroll');
+  const sbNav  = document.getElementById('sbNav');
+  const lang   = currentLang || 'es';
+  const allLabel = lang === 'en' ? 'All' : 'Todo';
+  const cats = [{ id: 'todo', name: allLabel }, ...CATALOG.map(c => ({ id: c.id, name: lang === 'en' ? (c.nameEn || c.name) : c.name }))];
+
+  cats.forEach((c, i) => {
+    const pill = document.createElement('button');
+    pill.className = 'cat-btn' + (i === 0 ? ' active' : '');
+    pill.textContent = c.name;
+    pill.dataset.target = c.id;
+    pill.onclick = () => filterCat(c.id);
+    scroll.appendChild(pill);
+
+    const sb = document.createElement('button');
+    sb.className = 'sb-btn' + (i === 0 ? ' active' : '');
+    sb.dataset.target = c.id;
+    sb.onclick = () => filterCat(c.id);
+    sb.innerHTML = `<span class="sb-dot"></span>${c.name}`;
+    sbNav.appendChild(sb);
+  });
+}
+
+function buildFeatured() {
+  const scroll = document.getElementById('featScroll');
+  const lang   = currentLang || 'es';
+  const Tr     = T[lang];
+  FEATURED_IDS.forEach((id, i) => {
+    const it = find(id);
+    if (!it) return;
+    const name  = lang === 'en' ? (it.nameEn  || it.name)  : it.name;
+    const desc  = lang === 'en' ? (it.descEn  || it.desc || '') : (it.desc || '');
+    const card  = document.createElement('div');
+    card.className = 'feat-card';
+    if (it.variants) card.onclick = () => openSheet(id);
+    card.innerHTML = `
+      <div class="feat-card-img">
+        <img src="${IMG.get(id, it.kw, 300 + i, 336, 240)}" alt="${name}" onerror="this.src='${ph()}'">
+        <span class="feat-badge">${Tr.badge}</span>
+      </div>
+      <div class="feat-card-body">
+        <div class="feat-name">${name}</div>
+        <div class="feat-desc">${desc}</div>
+        <div class="feat-price">${money(it.price, it.unit)}</div>
+      </div>`;
+    scroll.appendChild(card);
+  });
+}
+
+function buildCatalog() {
+  const catalog = document.getElementById('catalog');
+  const lang    = currentLang || 'es';
+  const Tr      = T[lang];
+  CATALOG.forEach(cat => {
+    const sec = document.createElement('div');
+    sec.className = 'sec';
+    sec.id = cat.id;
+    sec.dataset.section = cat.id;
+    const catName = lang === 'en' ? (cat.nameEn || cat.name) : cat.name;
+
+    const rows = cat.items.map((it, i) => {
+      const sold     = !!it.soldOut;
+      const name     = lang === 'en' ? (it.nameEn || it.name) : it.name;
+      const desc     = lang === 'en' ? (it.descEn || it.desc || '') : (it.desc || '');
+      const variants = lang === 'en' ? (it.variantsEn || it.variants) : it.variants;
+      const varBtn   = variants?.length
+        ? `<button class="variant-btn" onclick="event.stopPropagation();openSheet('${it.id}')">${variants.length} ${Tr.options} ▾</button>`
+        : '';
+      const descHtml  = desc ? `<div class="prow-desc">${desc}</div>` : '';
+      const soldBadge = sold ? `<div class="soldout-badge"><span>${Tr.soldOut}</span></div>` : '';
+      return `
+        <div class="prow${sold ? ' soldout' : ''}" ${variants?.length && !sold ? `onclick="openSheet('${it.id}')"` : ''}>
+          <div class="prow-thumb-wrap">
+            <img class="prow-thumb" src="${IMG.get(it.id, it.kw, 100 + i, 116, 116)}" alt="" onerror="this.src='${ph()}'">
+            ${soldBadge}
+          </div>
+          <div class="prow-info">
+            <div class="prow-top">
+              <span class="prow-name">${name}</span>
+              <span class="prow-price">${money(it.price, it.unit)}</span>
+            </div>
+            ${descHtml}${varBtn}
+          </div>
+        </div>`;
+    }).join('');
+
+    sec.innerHTML = `
+      <div class="sec-hdr">
+        <span class="sec-title">${catName}</span>
+        <span class="sec-line"></span>
+      </div>
+      <div class="catalog-grid">${rows}</div>`;
+    catalog.appendChild(sec);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FILTRO DE CATEGORÍAS
+// ═══════════════════════════════════════════════════════════════
+function filterCat(id) {
+  document.querySelectorAll('.cat-btn, .sb-btn').forEach(b => b.classList.toggle('active', b.dataset.target === id));
+  document.querySelectorAll('[data-section]').forEach(s => {
+    s.style.display = (id === 'todo' || s.dataset.section === id) ? '' : 'none';
+  });
+  document.getElementById('top').style.display = id === 'todo' ? '' : 'none';
+  if (id !== 'todo') {
+    const el = document.getElementById(id);
+    if (el) setTimeout(() => {
+      const main = document.querySelector('.main-content');
+      if (main) main.scrollTo({ top: el.offsetTop - 10, behavior: 'smooth' });
+      else el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 10);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOTTOM SHEET
+// ═══════════════════════════════════════════════════════════════
+function openSheet(id) {
+  const it   = find(id);
+  if (!it) return;
+  const lang = currentLang || 'es';
+  const Tr   = T[lang];
+  const variants = lang === 'en' ? (it.variantsEn || it.variants) : it.variants;
+  if (!variants?.length) return;
+
+  const name = lang === 'en' ? (it.nameEn || it.name) : it.name;
+  const desc = lang === 'en' ? (it.descEn || it.desc || '') : (it.desc || '');
+
+  document.getElementById('sheetImg').src = IMG.get(id, it.kw, 500, 124, 124);
+  document.getElementById('sheetName').textContent  = name;
+  document.getElementById('sheetPrice').textContent = money(it.price, it.unit);
+  const descEl = document.getElementById('sheetDesc');
+  descEl.textContent = desc;
+  descEl.style.display = desc ? '' : 'none';
+  document.getElementById('sheetVl').textContent = Tr.chooseVariant;
+
+  document.getElementById('sheetVariants').innerHTML = variants.map((v, i) => `
+    <button class="v-opt${i === 0 ? ' active' : ''}" onclick="selectV(this)">
+      <span class="v-radio"><span class="v-dot"></span></span>
+      <span class="v-name">${v}</span>
+      <span class="v-price">${money(it.price, it.unit)}</span>
+    </button>`).join('');
+
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('bsheet').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSheet() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('bsheet').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function selectV(btn) {
+  document.querySelectorAll('#sheetVariants .v-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INTERSECTION OBSERVER
+// ═══════════════════════════════════════════════════════════════
+function setupObserver() {
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.dataset.section;
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.toggle('active', b.dataset.target === id));
+      }
+    });
+  }, { rootMargin: '-40% 0px -50% 0px', threshold: 0 });
+  document.querySelectorAll('[data-section]').forEach(s => obs.observe(s));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+async function init() {
+  await loadSettings();
+
+  document.getElementById('coverImg').src = IMG.get('cover', 'coffee,shop,cafe', 42, 760, 420);
+
+  // Pre-build the menu (hidden behind selector if needed)
+  buildCatNav();
+  buildFeatured();
+  buildCatalog();
+  setupObserver();
+
+  if (currentLang) {
+    document.getElementById('langSelector').classList.add('hidden');
+    document.documentElement.lang = currentLang;
+    applyLang();
+  } else {
+    // Update selector text with loaded settings
+    const S = SETTINGS;
+    document.getElementById('lsBrand').textContent   = S.brandName;
+    document.getElementById('lsAddress').textContent = S.address || 'Tu Ciudad · País';
+    document.getElementById('lsTagline').textContent = S.tagline;
+    // Apply default ES for underlying menu
+    applyLang();
+    // Then show selector on top
+    document.getElementById('langSelector').classList.remove('hidden', 'hiding');
+  }
+}
+
+init();
+</script>
+</body>
+</html>

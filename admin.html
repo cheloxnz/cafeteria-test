@@ -1,0 +1,2831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Café Lúmina — Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --espresso: #2A1C12;
+      --cafe:     #6B4A33;
+      --crema:    #F6EEE2;
+      --crema2:   #EDE0CF;
+      --crema3:   #E2D2B8;
+      --caramelo: #C8843A;
+      --terracota:#B14B2E;
+      --oliva:    #6E7351;
+      --blanco:   #FFFCF6;
+      --texto:    #2B1D14;
+      --muted:    #9A8268;
+      --borde:    #E2D2B8;
+      --fd: 'Instrument Serif', Georgia, serif;
+      --fb: 'Hanken Grotesk', -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { height: 100%; }
+
+    body {
+      background: #EAE0D0;
+      font-family: var(--fb);
+      color: var(--texto);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── TOP NAV ─────────────────────────────── */
+    .topnav {
+      background: var(--blanco);
+      border-bottom: 1px solid var(--borde);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 1px 8px rgba(26,16,8,.06);
+    }
+    .brand {
+      font-family: var(--fd);
+      font-size: 22px;
+      color: var(--espresso);
+      line-height: 1.1;
+      text-decoration: none;
+    }
+    .brand span { display: block; }
+
+    .nav-tabs {
+      display: flex;
+      gap: 6px;
+      background: var(--crema2);
+      border-radius: 10px;
+      padding: 4px;
+    }
+    .nav-tab {
+      padding: 7px 18px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      font-family: var(--fb);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .18s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+    .nav-tab:hover  { color: var(--texto); background: rgba(255,255,255,.6); }
+    .nav-tab.active { background: var(--espresso); color: white; }
+
+    .ia-badge {
+      background: var(--caramelo);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: .03em;
+    }
+
+    .nav-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--espresso);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ── PAGE LAYOUT ─────────────────────────── */
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px 60px;
+    }
+
+    /* ── VIEWS (show/hide) ───────────────────── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── PRODUCTS VIEW ───────────────────────── */
+    .pview-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .pview-title { font-family: var(--fd); font-size: 32px; color: var(--espresso); line-height: 1.1; }
+    .pview-sub   { font-size: 14px; color: var(--muted); margin-top: 4px; }
+
+    .pview-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 9px;
+      padding: 8px 14px;
+      font-family: var(--fb);
+      font-size: 14px;
+      color: var(--muted);
+      transition: border-color .15s;
+      cursor: text;
+    }
+    .search-box:focus-within { border-color: var(--cafe); color: var(--texto); }
+    .search-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-family: var(--fb);
+      font-size: 14px;
+      color: var(--texto);
+      width: 180px;
+    }
+    .search-box input::placeholder { color: var(--muted); }
+
+    .btn-primary {
+      padding: 9px 18px;
+      background: var(--caramelo);
+      color: white;
+      border: none;
+      border-radius: 9px;
+      font-family: var(--fb);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background .15s, transform .12s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover  { background: #b57a2a; }
+    .btn-primary:active { transform: scale(.98); }
+
+    /* ── TABLE ───────────────────────────────── */
+    .ptable-wrap {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(26,16,8,.06);
+    }
+
+    .ptable-head {
+      display: grid;
+      grid-template-columns: 1fr 120px 130px 120px;
+      padding: 12px 16px;
+      background: var(--crema);
+      border-bottom: 1px solid var(--borde);
+    }
+    .th {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .th.right { text-align: right; }
+
+    .ptable-row {
+      display: grid;
+      grid-template-columns: 1fr 120px 130px 120px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--borde);
+      align-items: center;
+      transition: background .14s;
+    }
+    .ptable-row:last-child { border-bottom: none; }
+    .ptable-row:hover { background: var(--crema); }
+
+    .row-product {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .row-thumb {
+      width: 46px; height: 46px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: var(--crema2);
+      flex-shrink: 0;
+    }
+    .row-name { font-size: 14px; font-weight: 600; color: var(--espresso); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-cat  { font-size: 12px; color: var(--caramelo); font-weight: 600; }
+
+    .row-price { font-size: 15px; font-weight: 700; color: var(--cafe); }
+
+    .state-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .state-destacado { background: rgba(200,139,52,.15); color: var(--caramelo); }
+    .state-disponible { background: rgba(200,180,160,.25); color: var(--muted); }
+    .state-agotado    { background: rgba(193,91,37,.12); color: var(--terracota); }
+
+    .row-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+
+    .act-btn {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      border: 1.5px solid var(--borde);
+      background: var(--blanco);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+      font-size: 15px;
+      color: var(--muted);
+    }
+    .act-btn:hover      { border-color: var(--cafe); color: var(--cafe); }
+    .act-btn.star-on    { background: rgba(200,139,52,.12); border-color: var(--caramelo); color: var(--caramelo); }
+    .act-btn.agotado-on { background: rgba(193,91,37,.12); border-color: var(--terracota); color: var(--terracota); }
+
+    /* ── EDIT VIEW ───────────────────────────── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: color .15s;
+      background: none;
+      border: none;
+      font-family: var(--fb);
+      padding: 0;
+    }
+    .back-link:hover { color: var(--cafe); }
+
+    .edit-title {
+      font-family: var(--fd);
+      font-size: 30px;
+      color: var(--espresso);
+      margin-bottom: 28px;
+    }
+
+    .edit-card {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(26,16,8,.06);
+      padding: 28px;
+    }
+
+    .edit-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 32px;
+    }
+
+    @media (max-width: 640px) {
+      .edit-layout { grid-template-columns: 1fr; }
+      .ptable-head, .ptable-row { grid-template-columns: 1fr 90px 110px 100px; }
+    }
+
+    .photo-zone {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .photo-preview {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: var(--crema2);
+    }
+    .photo-preview img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .photo-change-btn {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(26,16,8,.7);
+      color: white;
+      border: none;
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-family: var(--fb);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      white-space: nowrap;
+    }
+    .photo-hint { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
+
+    .form-fields { display: flex; flex-direction: column; gap: 18px; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 140px; gap: 14px; }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: var(--blanco);
+      border: 1.5px solid var(--borde);
+      border-radius: 9px;
+      padding: 10px 13px;
+      font-family: var(--fb);
+      font-size: 14px;
+      color: var(--texto);
+      outline: none;
+      transition: border-color .15s;
+      -webkit-appearance: none;
+    }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus { border-color: var(--cafe); }
+    .field textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+    .field select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B7260' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+
+    /* Tags / variants */
+    .tags-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 9px 11px;
+      background: var(--blanco);
+      border: 1.5px solid var(--borde);
+      border-radius: 9px;
+      min-height: 44px;
+      align-items: center;
+      transition: border-color .15s;
+    }
+    .tags-wrap:focus-within { border-color: var(--cafe); }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--crema2);
+      border: 1px solid var(--crema3);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--cafe);
+    }
+    .tag-x {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1;
+      padding: 0;
+    }
+    .tag-x:hover { color: var(--terracota); }
+    .tag-add {
+      background: none;
+      border: 1px dashed var(--borde);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--fb);
+    }
+    .tag-add:hover { border-color: var(--cafe); color: var(--cafe); }
+
+    /* Toggles */
+    .toggles-row {
+      display: flex;
+      gap: 16px;
+      padding-top: 4px;
+      flex-wrap: wrap;
+    }
+    .toggle-item {
+      flex: 1;
+      min-width: 180px;
+      background: var(--crema);
+      border: 1px solid var(--borde);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .toggle-info .tl { font-size: 14px; font-weight: 600; color: var(--espresso); }
+    .toggle-info .ts { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+    .toggle {
+      position: relative;
+      width: 44px; height: 24px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 100px;
+      background: var(--crema3);
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .toggle input:checked ~ .toggle-track { background: var(--caramelo); }
+    .toggle-thumb {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: white;
+      transition: left .2s;
+      pointer-events: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    }
+    .toggle input:checked ~ .toggle-track .toggle-thumb { left: 23px; }
+
+    .edit-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid var(--borde);
+    }
+    .btn-ghost {
+      padding: 10px 20px;
+      background: transparent;
+      border: 1.5px solid var(--borde);
+      border-radius: 9px;
+      font-family: var(--fb);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+    .btn-ghost:hover { border-color: var(--cafe); color: var(--cafe); }
+    .btn-save {
+      padding: 10px 22px;
+      background: var(--espresso);
+      border: none;
+      border-radius: 9px;
+      font-family: var(--fb);
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-save:hover { background: var(--cafe); }
+
+    /* ── GENERATOR VIEW ──────────────────────── */
+    .gen-hero {
+      text-align: center;
+      padding: 20px 0 36px;
+    }
+    .gen-supertag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(200,139,52,.12);
+      border: 1px solid rgba(200,139,52,.25);
+      border-radius: 100px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--caramelo);
+      margin-bottom: 18px;
+    }
+    .gen-title {
+      font-family: var(--fd);
+      font-size: 40px;
+      color: var(--espresso);
+      line-height: 1.05;
+      margin-bottom: 10px;
+    }
+    .gen-sub { font-size: 15px; color: var(--muted); max-width: 480px; margin: 0 auto; line-height: 1.5; }
+
+    /* Steps */
+    .gen-step { margin-bottom: 32px; }
+    .step-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .step-num {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--espresso);
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-title { font-size: 16px; font-weight: 700; color: var(--espresso); }
+    .step-optional { font-size: 12px; color: var(--muted); font-weight: 400; margin-left: 6px; }
+
+    /* Product grid */
+    .prod-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 640px) { .prod-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .prod-pick {
+      border: 2px solid var(--borde);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--blanco);
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .prod-pick:hover   { border-color: var(--cafe); }
+    .prod-pick.sel     { border-color: var(--caramelo); box-shadow: 0 0 0 1px var(--caramelo); }
+    .prod-pick img     { width: 100%; height: 90px; object-fit: cover; display: block; background: var(--crema2); }
+    .prod-pick-body    { padding: 8px 10px 10px; }
+    .prod-pick-name    { font-size: 13px; font-weight: 600; color: var(--espresso); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .prod-pick-price   { font-size: 12px; font-weight: 700; color: var(--caramelo); }
+
+    /* Type cards */
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    @media (max-width: 600px) { .type-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .type-card {
+      border: 2px solid var(--borde);
+      border-radius: 12px;
+      padding: 14px 14px 16px;
+      cursor: pointer;
+      background: var(--blanco);
+      transition: border-color .15s, box-shadow .15s, background .15s;
+      position: relative;
+    }
+    .type-card:hover { border-color: var(--cafe); }
+    .type-card.sel   { border-color: var(--espresso); box-shadow: 0 0 0 1px var(--espresso); background: var(--espresso); }
+
+    .type-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .tb-promo     { background: var(--espresso); color: white; }
+    .tb-descuento { background: var(--terracota); color: white; }
+    .tb-nuevo     { background: var(--oliva);    color: white; }
+    .tb-temp      { background: var(--caramelo); color: white; }
+    .type-card.sel .tb-promo { background: white; color: var(--espresso); }
+
+    .type-name { font-size: 16px; font-weight: 700; color: var(--espresso); margin-bottom: 4px; }
+    .type-desc { font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .type-card.sel .type-name,
+    .type-card.sel .type-desc { color: rgba(255,255,255,.75); }
+    .type-card.sel .type-name { color: white; }
+
+    /* Tone pills */
+    .tone-pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tone-pill {
+      padding: 8px 18px;
+      border-radius: 100px;
+      border: 1.5px solid var(--borde);
+      background: var(--blanco);
+      font-family: var(--fb);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .tone-pill:hover { border-color: var(--cafe); color: var(--cafe); }
+    .tone-pill.sel   { background: var(--espresso); border-color: var(--espresso); color: white; }
+
+    /* Detail input */
+    .detail-input {
+      width: 100%;
+      background: var(--blanco);
+      border: 1.5px solid var(--borde);
+      border-radius: 10px;
+      padding: 12px 15px;
+      font-family: var(--fb);
+      font-size: 14px;
+      color: var(--texto);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .detail-input:focus { border-color: var(--cafe); }
+    .detail-input::placeholder { color: var(--muted); }
+
+    /* Generate button */
+    .gen-btn-wrap { padding-top: 8px; }
+    .btn-generar {
+      width: 100%;
+      padding: 16px;
+      background: var(--espresso);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--fb);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .15s, transform .12s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .btn-generar:hover  { background: var(--cafe); }
+    .btn-generar:active { transform: scale(.99); }
+    .btn-generar:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes shim { 0%{background-position:-500px 0} 100%{background-position:500px 0} }
+
+    /* ── LOADING VIEW ────────────────────────── */
+    #loadingView {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 24px 60px;
+      text-align: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    #loadingView.active { display: flex; }
+
+    .loading-ring {
+      width: 62px; height: 62px;
+      border: 4px solid var(--crema3);
+      border-top-color: var(--caramelo);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 22px;
+    }
+
+    .loading-step {
+      font-family: var(--fd);
+      font-size: 26px;
+      color: var(--espresso);
+      margin-bottom: 6px;
+    }
+    .loading-sub { font-size: 13.5px; color: var(--muted); margin-bottom: 22px; }
+
+    .loading-bar-wrap {
+      height: 7px;
+      background: var(--crema3);
+      border-radius: 10px;
+      overflow: hidden;
+      width: 380px;
+      max-width: 100%;
+      margin-bottom: 36px;
+    }
+    .loading-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--caramelo), var(--terracota));
+      border-radius: 10px;
+      width: 10%;
+      transition: width 0.45s ease;
+    }
+
+    .loading-skeleton {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 22px;
+      text-align: left;
+      width: 100%;
+    }
+    @media (max-width: 600px) { .loading-skeleton { grid-template-columns: 1fr; } }
+
+    .skel {
+      background: linear-gradient(90deg, #EFE5D6 25%, #F8F1E5 50%, #EFE5D6 75%);
+      background-size: 500px 100%;
+      animation: shim 1.3s infinite linear;
+      border-radius: 8px;
+    }
+
+    /* ── RESULT VIEW ─────────────────────────── */
+    #resultView {
+      display: none;
+    }
+    #resultView.active { display: block; }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .result-check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .check-icon {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--oliva);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .result-title { font-size: 20px; font-weight: 700; color: var(--espresso); }
+    .result-crumbs { font-size: 13px; color: var(--muted); margin-top: 1px; }
+
+    .restart-btn {
+      background: none;
+      border: none;
+      font-family: var(--fb);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0;
+      transition: color .15s;
+    }
+    .restart-btn:hover { color: var(--cafe); }
+
+    .result-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 640px) { .result-layout { grid-template-columns: 1fr; } }
+
+    /* Promo card */
+    .promo-card-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .promo-card {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .promo-card-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+    .promo-card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,.25) 0%, transparent 35%, rgba(0,0,0,.72) 100%);
+    }
+    .promo-card-top {
+      position: absolute;
+      top: 14px; left: 14px; right: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .promo-card-cafename {
+      font-family: var(--fd);
+      font-size: 14px;
+      color: white;
+      font-style: italic;
+    }
+    .promo-card-badge {
+      background: var(--caramelo);
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .1em;
+      padding: 4px 10px;
+      border-radius: 100px;
+    }
+    .promo-card-bottom {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 16px 18px 20px;
+    }
+    .promo-card-pname {
+      font-family: var(--fd);
+      font-size: 38px;
+      color: white;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .promo-card-price-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .promo-card-price {
+      font-size: 20px;
+      font-weight: 800;
+      color: white;
+    }
+    .promo-card-cta {
+      font-size: 12px;
+      color: rgba(255,255,255,.65);
+      border-left: 1px solid rgba(255,255,255,.3);
+      padding-left: 8px;
+    }
+
+    .download-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-download {
+      flex: 1;
+      padding: 11px;
+      background: var(--espresso);
+      color: white;
+      border: none;
+      border-radius: 9px;
+      font-family: var(--fb);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: background .15s;
+    }
+    .btn-download:hover { background: var(--cafe); }
+    .btn-regen {
+      width: 42px; height: 42px;
+      background: var(--blanco);
+      border: 1.5px solid var(--borde);
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: border-color .15s;
+      flex-shrink: 0;
+    }
+    .btn-regen:hover { border-color: var(--cafe); }
+
+    /* Caption + Instagram preview */
+    .result-right {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .caption-box {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .caption-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .caption-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .btn-copy {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      background: var(--crema2);
+      border: 1px solid var(--borde);
+      border-radius: 7px;
+      font-family: var(--fb);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cafe);
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-copy:hover { background: var(--crema3); }
+    .caption-text {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--texto);
+    }
+    .caption-hashtags {
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--caramelo);
+      font-weight: 600;
+    }
+
+    /* Instagram preview */
+    .ig-preview {
+      background: var(--blanco);
+      border: 1px solid var(--borde);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .ig-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+    }
+    .ig-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ig-avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--caramelo), var(--terracota));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+    }
+    .ig-username  { font-size: 13px; font-weight: 700; color: var(--texto); }
+    .ig-sub       { font-size: 11px; color: var(--muted); }
+    .ig-dots      { color: var(--muted); font-size: 18px; cursor: pointer; }
+    .ig-img-wrap  { width: 100%; aspect-ratio: 1; overflow: hidden; }
+    .ig-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ig-actions   { padding: 10px 12px 6px; display: flex; gap: 14px; }
+    .ig-icon      { font-size: 20px; cursor: pointer; }
+    .ig-caption   { padding: 4px 12px 14px; font-size: 12px; line-height: 1.4; color: var(--texto); }
+    .ig-caption strong { font-weight: 700; }
+
+    .btn-copy-all {
+      width: 100%;
+      padding: 13px;
+      background: transparent;
+      border: 1.5px solid var(--borde);
+      border-radius: 10px;
+      font-family: var(--fb);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--cafe);
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-copy-all:hover { border-color: var(--cafe); background: rgba(107,75,51,.05); }
+
+    /* ── DASHBOARD ──────────────────────────── */
+    .dash-header { padding: 8px 0 28px; }
+    .dash-date {
+      font-size: 11px; font-weight: 700; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+    }
+    .dash-greeting {
+      font-family: var(--fd); font-size: 38px; color: var(--espresso);
+      line-height: 1.05; margin-bottom: 6px;
+    }
+    .dash-greeting .dash-name { color: var(--caramelo); font-style: italic; }
+    .dash-sub { font-size: 14px; color: var(--muted); }
+    .dash-sub strong { color: var(--texto); }
+
+    .dash-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 12px; margin-bottom: 28px;
+    }
+    @media (max-width: 800px) { .dash-stats { grid-template-columns: repeat(2, 1fr); } }
+
+    .stat-card {
+      background: var(--blanco); border: 1px solid var(--borde);
+      border-radius: 14px; padding: 16px 18px 18px;
+      box-shadow: 0 2px 8px rgba(26,16,8,.05);
+    }
+    .stat-tag {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--caramelo); margin-bottom: 8px;
+    }
+    .stat-num {
+      font-family: var(--fd); font-size: 32px; color: var(--espresso);
+      line-height: 1; margin-bottom: 4px;
+    }
+    .stat-change { font-size: 12px; font-weight: 600; }
+    .stat-change.positive { color: var(--oliva); }
+    .stat-change.neutral  { color: var(--muted); }
+
+    .dash-main {
+      display: grid; grid-template-columns: 1fr 280px;
+      gap: 20px; align-items: start;
+    }
+    @media (max-width: 800px) { .dash-main { grid-template-columns: 1fr; } }
+
+    .dash-section-title { font-size: 20px; font-weight: 700; color: var(--espresso); margin-bottom: 4px; }
+    .dash-section-sub   { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .qa-card {
+      background: var(--blanco); border: 1px solid var(--borde);
+      border-radius: 12px; padding: 14px 16px; cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+      display: flex; align-items: flex-start; gap: 12px;
+      text-align: left;
+    }
+    .qa-card:hover { border-color: var(--cafe); box-shadow: 0 2px 10px rgba(26,16,8,.08); }
+    .qa-icon {
+      width: 34px; height: 34px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+    .qa-icon-amber    { background: rgba(200,139,52,.15); }
+    .qa-icon-terra    { background: rgba(177,75,46,.12); }
+    .qa-icon-espresso { background: rgba(42,28,18,.1); }
+    .qa-icon-olive    { background: rgba(110,115,81,.12); }
+    .qa-title { font-size: 13px; font-weight: 700; color: var(--espresso); margin-bottom: 2px; }
+    .qa-sub   { font-size: 11px; color: var(--muted); line-height: 1.35; }
+
+    .suggestion-card {
+      background: var(--espresso); border-radius: 14px;
+      padding: 20px; position: sticky; top: 80px;
+    }
+    .sug-tag {
+      font-size: 9px; font-weight: 800; letter-spacing: .14em;
+      text-transform: uppercase; color: rgba(255,255,255,.45); margin-bottom: 12px;
+    }
+    .sug-title {
+      font-family: var(--fd); font-size: 18px; color: white;
+      line-height: 1.3; margin-bottom: 10px;
+    }
+    .sug-desc { font-size: 12px; color: rgba(255,255,255,.55); line-height: 1.5; margin-bottom: 16px; }
+    .sug-btn {
+      width: 100%; padding: 11px; background: var(--caramelo); color: #1A0C04;
+      border: none; border-radius: 9px; font-family: var(--fb);
+      font-size: 13px; font-weight: 800; cursor: pointer; transition: background .15s;
+    }
+    .sug-btn:hover { background: #DA9440; }
+
+    /* ── FORMAT CARDS ────────────────────────── */
+    .format-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    @media (max-width: 600px) { .format-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .format-card {
+      border: 2px solid var(--borde); border-radius: 12px; padding: 14px 12px;
+      cursor: pointer; background: var(--blanco);
+      transition: border-color .15s, box-shadow .15s;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .format-card:hover { border-color: var(--cafe); }
+    .format-card.sel   { border-color: var(--caramelo); box-shadow: 0 0 0 1px var(--caramelo); }
+    .format-preview { background: var(--crema2); border-radius: 5px; border: 1px solid var(--crema3); }
+    .fp-square   { width: 44px; height: 44px; }
+    .fp-story    { width: 25px; height: 44px; }
+    .fp-land     { width: 58px; height: 33px; }
+    .fp-carousel { width: 44px; height: 44px; box-shadow: 4px 4px 0 var(--crema3); }
+    .format-name { font-size: 12px; font-weight: 700; color: var(--espresso); text-align: center; }
+    .format-dims { font-size: 10px; color: var(--muted); text-align: center; }
+
+    /* ── ADVANCED OPTIONS ────────────────────── */
+    .adv-toggle {
+      display: flex; align-items: center; gap: 8px; background: none; border: none;
+      font-family: var(--fb); font-size: 12px; font-weight: 700;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); cursor: pointer; padding: 0;
+      transition: color .15s;
+    }
+    .adv-toggle:hover { color: var(--cafe); }
+    .adv-arrow { transition: transform .2s; display: inline-block; }
+    .adv-toggle.open .adv-arrow { transform: rotate(180deg); }
+    .adv-options {
+      display: none; flex-wrap: wrap; gap: 8px;
+      background: var(--blanco); border: 1px solid var(--borde);
+      border-radius: 12px; padding: 14px; margin-top: 12px;
+    }
+    .adv-options.open { display: flex; }
+    .adv-opt {
+      display: flex; align-items: center; gap: 7px; padding: 7px 14px;
+      border: 1.5px solid var(--borde); border-radius: 100px; background: var(--blanco);
+      cursor: pointer; transition: all .15s; font-family: var(--fb);
+      font-size: 13px; font-weight: 600; color: var(--muted);
+    }
+    .adv-opt:hover { border-color: var(--cafe); color: var(--cafe); }
+    .adv-opt.on    { background: rgba(200,139,52,.1); border-color: var(--caramelo); color: var(--cafe); }
+    .adv-opt-dot   { width: 7px; height: 7px; border-radius: 50%; background: var(--crema3); flex-shrink: 0; transition: background .15s; }
+    .adv-opt.on .adv-opt-dot { background: var(--caramelo); }
+
+    /* ── LOGIN OVERLAY ──────────────────────── */
+    .login-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: #120A03;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 24px;
+      transition: opacity .3s;
+    }
+    .login-overlay.hidden { display: none; }
+    .login-overlay.hiding { opacity: 0; pointer-events: none; }
+    .login-brand {
+      font-family: var(--fd); font-style: italic;
+      font-size: 44px; color: #F8EFE2;
+      text-align: center; margin-bottom: 6px;
+    }
+    .login-sub {
+      font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+      color: #6A5040; margin-bottom: 40px; text-align: center;
+    }
+    .login-card {
+      width: 100%; max-width: 360px;
+      background: #1E1008; border: 1px solid #2E1A0A;
+      border-radius: 18px; padding: 28px 24px;
+    }
+    .login-label {
+      font-size: 11px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: #7A6048; margin-bottom: 10px;
+    }
+    .login-input {
+      width: 100%; padding: 13px 16px;
+      background: #150C04; border: 1.5px solid #2E1A0A;
+      border-radius: 10px; color: #F0E2D2;
+      font-family: var(--fb); font-size: 16px;
+      outline: none; letter-spacing: .06em;
+      transition: border-color .15s;
+      margin-bottom: 14px;
+    }
+    .login-input:focus { border-color: #C8843A; }
+    .login-input::placeholder { color: #5A4030; letter-spacing: 0; }
+    .login-btn {
+      width: 100%; padding: 14px;
+      background: #C8843A; color: #1A0C04;
+      border: none; border-radius: 10px;
+      font-family: var(--fb); font-size: 15px; font-weight: 800;
+      cursor: pointer; transition: background .18s;
+    }
+    .login-btn:hover { background: #DA9440; }
+    .login-error {
+      font-size: 12px; color: var(--terracota);
+      text-align: center; margin-top: 10px;
+      min-height: 18px;
+    }
+    .login-hint {
+      font-size: 11px; color: #5A4030;
+      text-align: center; margin-top: 14px; line-height: 1.5;
+    }
+
+    /* ── SETTINGS VIEW ───────────────────────── */
+    .settings-card {
+      background: var(--blanco); border: 1px solid var(--borde);
+      border-radius: 16px; overflow: hidden;
+      box-shadow: 0 2px 12px rgba(26,16,8,.06);
+      padding: 28px; margin-bottom: 24px;
+    }
+    .settings-section-title {
+      font-family: var(--fd); font-size: 18px;
+      color: var(--espresso); margin-bottom: 18px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--borde);
+    }
+    .settings-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+    }
+    @media (max-width: 640px) { .settings-grid { grid-template-columns: 1fr; } }
+
+    .settings-alert {
+      background: rgba(200,139,52,.1); border: 1px solid rgba(200,139,52,.25);
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 13px; color: var(--cafe); margin-bottom: 24px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+
+    /* ── NEW GENERATOR REDESIGN ─────────────────── */
+    .gen-new-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 800px) { .gen-new-layout { grid-template-columns: 1fr; } }
+
+    .gen-steps-col { display: flex; flex-direction: column; gap: 10px; }
+
+    .gen-step-card {
+      background: var(--blanco);
+      border: 1.5px solid var(--borde);
+      border-radius: 16px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      transition: border-color .15s;
+    }
+    .gen-step-card:hover { border-color: var(--cafe); }
+
+    .gsc-thumb {
+      width: 52px; height: 52px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: var(--crema2);
+      flex-shrink: 0;
+    }
+    .gsc-icon {
+      width: 52px; height: 52px;
+      border-radius: 10px;
+      background: var(--espresso);
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-style: italic;
+      letter-spacing: -.01em;
+    }
+    .gsc-body { flex: 1; min-width: 0; }
+    .gsc-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--caramelo); margin-bottom: 2px;
+    }
+    .gsc-name {
+      font-size: 14px; font-weight: 700;
+      color: var(--espresso);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .gsc-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .gsc-select {
+      flex-shrink: 0;
+      background: var(--crema);
+      border: 1.5px solid var(--borde);
+      border-radius: 9px;
+      padding: 7px 28px 7px 11px;
+      font-family: var(--fb);
+      font-size: 12px; font-weight: 600;
+      color: var(--espresso);
+      cursor: pointer; outline: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238B7260' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 9px center;
+      max-width: 150px; min-width: 110px;
+      transition: border-color .15s;
+    }
+    .gsc-select:focus { border-color: var(--cafe); }
+
+    .gen-step3 {
+      background: var(--blanco);
+      border: 1.5px solid var(--borde);
+      border-radius: 16px;
+      padding: 18px 16px 16px;
+    }
+    .gen-step3-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--caramelo); margin-bottom: 3px;
+    }
+    .gen-step3-title { font-size: 17px; font-weight: 700; color: var(--espresso); margin-bottom: 2px; }
+    .gen-step3-sub   { font-size: 12px; color: var(--muted); margin-bottom: 11px; line-height: 1.4; }
+
+    .gen-textarea {
+      width: 100%;
+      background: var(--crema);
+      border: 1.5px solid var(--borde);
+      border-radius: 10px;
+      padding: 11px 13px;
+      font-family: var(--fb); font-size: 14px; color: var(--texto);
+      outline: none; transition: border-color .15s;
+      resize: none; min-height: 74px; line-height: 1.5;
+      margin-bottom: 11px;
+    }
+    .gen-textarea:focus { border-color: var(--cafe); }
+    .gen-textarea::placeholder { color: var(--muted); }
+
+    .gen-chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+
+    .gen-type-chip {
+      padding: 5px 12px; border-radius: 100px;
+      border: 1.5px solid var(--borde); background: var(--blanco);
+      font-family: var(--fb); font-size: 12px; font-weight: 600;
+      color: var(--muted); cursor: pointer; transition: all .15s;
+    }
+    .gen-type-chip:hover { border-color: var(--cafe); color: var(--cafe); }
+    .gen-type-chip.sel   { background: var(--espresso); border-color: var(--espresso); color: white; }
+
+    .gen-tone-chip {
+      padding: 6px 14px; border-radius: 100px;
+      border: 1.5px solid var(--borde); background: var(--blanco);
+      font-family: var(--fb); font-size: 13px; font-weight: 600;
+      color: var(--muted); cursor: pointer; transition: all .15s;
+    }
+    .gen-tone-chip:hover { border-color: var(--cafe); color: var(--cafe); }
+    .gen-tone-chip.sel   { background: var(--espresso); border-color: var(--espresso); color: white; }
+
+    .gen-adv-section {
+      border-top: 1px solid var(--borde);
+      padding-top: 12px; margin-top: 4px; margin-bottom: 14px;
+    }
+    .gen-adv-lbl {
+      font-size: 10px; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 9px;
+    }
+    .gen-adv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 480px) { .gen-adv-grid { grid-template-columns: 1fr; } }
+    .gen-adv-item {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; font-size: 12px; font-weight: 600; color: var(--texto);
+      cursor: pointer;
+    }
+
+    .gen-preview-col { position: sticky; top: 80px; }
+    .gen-preview-card {
+      background: var(--blanco); border: 1.5px solid var(--borde);
+      border-radius: 16px; overflow: hidden;
+    }
+    .gen-preview-hdr {
+      padding: 11px 14px;
+      background: var(--crema); border-bottom: 1px solid var(--borde);
+      font-size: 10px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .gen-preview-img-wrap {
+      width: 100%; aspect-ratio: 1;
+      background: var(--crema2); background-size: cover; background-position: center;
+      position: relative; transition: background-image .3s;
+    }
+    .gen-preview-gradient {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,.6));
+      display: flex; align-items: flex-end; padding: 14px;
+    }
+    .gen-preview-sub {
+      font-size: 11px; color: rgba(255,255,255,.85); line-height: 1.5;
+    }
+    .gen-preview-body {
+      padding: 11px 14px; font-size: 12px; color: var(--muted); line-height: 1.5;
+    }
+
+    /* ── BIBLIOTECA ──────────────────────────────── */
+    .bib-header { padding: 8px 0 20px; }
+    .bib-supertag {
+      font-size: 10px; font-weight: 700; letter-spacing: .16em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 6px;
+    }
+    .bib-title { font-family: var(--fd); font-size: 36px; color: var(--espresso); margin-bottom: 20px; }
+
+    .bib-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 22px; }
+    .bib-filter {
+      padding: 6px 14px; border-radius: 100px;
+      border: 1.5px solid var(--borde); background: var(--blanco);
+      font-family: var(--fb); font-size: 13px; font-weight: 600;
+      color: var(--muted); cursor: pointer; transition: all .15s;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .bib-filter:hover { border-color: var(--cafe); color: var(--cafe); }
+    .bib-filter.active { background: var(--espresso); border-color: var(--espresso); color: white; }
+    .bib-fcnt {
+      font-size: 11px; font-weight: 700; padding: 1px 6px;
+      border-radius: 100px;
+    }
+    .bib-filter.active .bib-fcnt  { background: rgba(255,255,255,.2); }
+    .bib-filter:not(.active) .bib-fcnt { background: var(--crema2); color: var(--muted); }
+
+    .bib-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+    @media (max-width: 760px) { .bib-grid { grid-template-columns: repeat(2,1fr); } }
+
+    .bib-empty {
+      grid-column: 1/-1; text-align: center;
+      padding: 60px 20px; color: var(--muted);
+    }
+    .bib-empty-icon  { font-size: 36px; margin-bottom: 12px; opacity: .4; }
+    .bib-empty-title { font-size: 18px; font-weight: 700; color: var(--espresso); margin-bottom: 6px; }
+    .bib-empty-sub   { font-size: 14px; }
+
+    .bib-item {
+      background: var(--blanco); border: 1px solid var(--borde);
+      border-radius: 14px; overflow: hidden;
+      box-shadow: 0 2px 8px rgba(26,16,8,.05);
+      transition: box-shadow .15s, transform .15s;
+    }
+    .bib-item:hover { box-shadow: 0 4px 16px rgba(26,16,8,.1); transform: translateY(-1px); }
+
+    .bib-img {
+      width: 100%; aspect-ratio: 1;
+      background: var(--crema2); background-size: cover; background-position: center;
+      position: relative;
+    }
+    .bib-img.story { aspect-ratio: 9/16; max-height: 220px; }
+    .bib-badges {
+      position: absolute; top: 8px; left: 8px; right: 8px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .bib-fmt {
+      background: rgba(0,0,0,.52); backdrop-filter: blur(4px);
+      color: white; font-size: 9px; font-weight: 700;
+      letter-spacing: .06em; padding: 3px 7px; border-radius: 5px;
+    }
+    .bib-status {
+      font-size: 9px; font-weight: 800; letter-spacing: .08em;
+      padding: 3px 8px; border-radius: 5px;
+    }
+    .bib-status-listo    { background: rgba(110,115,81,.9); color: white; }
+    .bib-status-publicado { background: var(--caramelo); color: white; }
+    .bib-title-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 22px 10px 10px;
+      background: linear-gradient(to top, rgba(0,0,0,.65), transparent);
+      font-family: var(--fd); font-size: 14px; color: white;
+      line-height: 1.2; font-style: italic;
+    }
+    .bib-footer {
+      padding: 10px 12px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .bib-iname {
+      font-size: 13px; font-weight: 600; color: var(--espresso);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .bib-itime { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .bib-iacts { display: flex; gap: 4px; flex-shrink: 0; }
+    .bib-act {
+      width: 30px; height: 30px; border-radius: 7px;
+      border: 1.5px solid var(--borde); background: transparent;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; color: var(--muted); transition: all .15s;
+    }
+    .bib-act:hover { border-color: var(--cafe); color: var(--cafe); }
+
+    /* ── MOBILE NAV ──────────────────────────── */
+    @media (max-width: 520px) {
+      .topnav { padding: 0 14px; }
+      .brand { font-size: 18px; }
+      .nav-tab { padding: 6px 12px; font-size: 13px; }
+      .page { padding: 20px 14px 60px; }
+      .pview-head { flex-direction: column; align-items: flex-start; }
+      .gen-title { font-size: 30px; }
+      .ptable-head { display: none; }
+      .ptable-row { grid-template-columns: 1fr auto; grid-template-rows: auto auto; gap: 8px; padding: 12px; }
+      .ptable-row > :nth-child(2) { display: none; }
+      .ptable-row > :nth-child(3) { grid-column: 2; grid-row: 1; }
+      .ptable-row > :nth-child(4) { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ LOGIN OVERLAY ════════════════════════════ -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-brand" id="loginBrand">Café Lúmina</div>
+  <div class="login-sub">Panel de administración</div>
+  <div class="login-card">
+    <div class="login-label">Contraseña</div>
+    <input class="login-input" type="password" id="loginInput"
+      placeholder="Ingresá tu contraseña"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Ingresar al panel →</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hint">Contraseña por defecto: <strong style="color:#A08060">admin</strong><br>Cambiala desde Configuración.</div>
+  </div>
+</div>
+
+  <!-- TOP NAV -->
+  <header class="topnav">
+    <a class="brand" href="index.html">
+      Café<span>Lúmina</span>
+    </a>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showTab('dashboard')">Inicio</button>
+      <button class="nav-tab" onclick="showTab('products')">Productos</button>
+      <button class="nav-tab" onclick="showTab('generator')">
+        Generador <span class="ia-badge">IA</span>
+      </button>
+      <button class="nav-tab" onclick="showTab('biblioteca')">Biblioteca</button>
+      <button class="nav-tab" onclick="showTab('settings')">⚙ Config</button>
+    </div>
+    <div class="nav-avatar" onclick="doLogout()" title="Cerrar sesión" style="cursor:pointer">L</div>
+  </header>
+
+  <!-- ══ DASHBOARD TAB ══════════════════════════ -->
+  <div class="view active" id="dashboardTab">
+    <div class="page">
+      <div class="dash-header">
+        <div class="dash-date" id="dashDate">HOY</div>
+        <h1 class="dash-greeting" id="dashGreeting">Buenos días, <span class="dash-name" id="dashName">Admin</span></h1>
+        <p class="dash-sub">Tu menú tuvo <strong id="dashViews">—</strong> vistas ayer. Aquí está el resumen.</p>
+      </div>
+
+      <div class="dash-stats">
+        <div class="stat-card">
+          <div class="stat-tag">Vistas al menú</div>
+          <div class="stat-num" id="statViews">—</div>
+          <div class="stat-change positive" id="statViewsSub">este mes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-tag">Platillo más pedido</div>
+          <div class="stat-num" id="statTop" style="font-size:18px;line-height:1.2;padding-top:4px;">—</div>
+          <div class="stat-change neutral">destacado</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-tag">Contenido generado</div>
+          <div class="stat-num" id="statContent">0</div>
+          <div class="stat-change neutral">este mes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-tag">Productos en menú</div>
+          <div class="stat-num" id="statProds">—</div>
+          <div class="stat-change neutral" id="statProdsSub">en carta</div>
+        </div>
+      </div>
+
+      <div class="dash-main">
+        <div>
+          <div class="dash-section-title">¿Qué hacemos hoy?</div>
+          <div class="dash-section-sub">Atajos a las tareas que más usás.</div>
+          <div class="quick-actions">
+            <button class="qa-card" onclick="showTab('generator')">
+              <div class="qa-icon qa-icon-amber">✦</div>
+              <div>
+                <div class="qa-title">Crear post para Instagram</div>
+                <div class="qa-sub">Foto + copy con IA · 30s</div>
+              </div>
+            </button>
+            <button class="qa-card" onclick="showTab('products')">
+              <div class="qa-icon qa-icon-terra">⊘</div>
+              <div>
+                <div class="qa-title">Marcar platillo agotado</div>
+                <div class="qa-sub">Se oculta automáticamente</div>
+              </div>
+            </button>
+            <button class="qa-card" onclick="showTab('products');setTimeout(()=>showEdit(null),50)">
+              <div class="qa-icon qa-icon-espresso">＋</div>
+              <div>
+                <div class="qa-title">Agregar producto nuevo</div>
+                <div class="qa-sub">Con traducción automática</div>
+              </div>
+            </button>
+            <button class="qa-card" onclick="showTab('settings')">
+              <div class="qa-icon qa-icon-olive">⚙</div>
+              <div>
+                <div class="qa-title">Editar configuración</div>
+                <div class="qa-sub">Nombre, dirección, horario</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <div class="suggestion-card">
+          <div class="sug-tag">Sugerencia de hoy</div>
+          <div class="sug-title" id="sugTitle">Generá un post de tu producto más popular</div>
+          <div class="sug-desc" id="sugDesc">Los clientes que ven contenido fresco interactúan un 40% más con tu menú.</div>
+          <button class="sug-btn" onclick="showTab('generator')">✦ Generar post ahora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PRODUCTS VIEW ══════════════════════════ -->
+  <div class="view" id="productsTab">
+    <div id="productsView" class="view active">
+      <div class="page">
+        <div class="pview-head">
+          <div>
+            <div class="pview-title">Tus productos</div>
+            <div class="pview-sub">Gestioná tu carta y actualizá disponibilidad en segundos.</div>
+          </div>
+          <div class="pview-actions">
+            <label class="search-box">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input type="text" placeholder="Buscar producto..." oninput="filterProducts(this.value)">
+            </label>
+            <button class="btn-primary" onclick="showEdit(null)">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+              Nuevo producto
+            </button>
+          </div>
+        </div>
+
+        <div class="ptable-wrap">
+          <div class="ptable-head">
+            <div class="th">Producto</div>
+            <div class="th right">Precio</div>
+            <div class="th">Estado</div>
+            <div class="th right">Acciones</div>
+          </div>
+          <div id="productsTableBody"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EDIT VIEW ── -->
+    <div id="editView" class="view">
+      <div class="page">
+        <button class="back-link" onclick="showView('productsView')">
+          ← Volver a productos
+        </button>
+        <h1 class="edit-title" id="editTitle">Editar producto</h1>
+
+        <div class="edit-card">
+          <div class="edit-layout">
+            <!-- Photo -->
+            <div class="photo-zone">
+              <div class="photo-preview">
+                <img id="editPhoto" src="" alt="">
+                <button class="photo-change-btn">⇅ Cambiar</button>
+              </div>
+              <div class="photo-hint">JPG o PNG, máximo 800×800px.<br>Arrastrá o hacé clic para reemplazar.</div>
+            </div>
+
+            <!-- Fields -->
+            <div class="form-fields">
+              <div class="form-row">
+                <div class="field">
+                  <label>Nombre</label>
+                  <input type="text" id="fNombre" placeholder="Ej: Café de pistacho">
+                </div>
+                <div class="field">
+                  <label>Precio</label>
+                  <input type="text" id="fPrecio" placeholder="$5.000">
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Categoría</label>
+                <select id="fCategoria">
+                  <option>Cafés</option>
+                  <option>Cafés Especiales</option>
+                  <option>Infusiones</option>
+                  <option>Bebidas</option>
+                  <option>Promos</option>
+                  <option>Panadería</option>
+                  <option>Pastelería</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label>Descripción</label>
+                <textarea id="fDesc" placeholder="Describí el producto brevemente…"></textarea>
+              </div>
+
+              <div class="field">
+                <label>Variantes</label>
+                <div class="tags-wrap" id="tagsWrap">
+                  <!-- populated by JS -->
+                  <button class="tag-add" onclick="addVariant()">+ Agregar variante</button>
+                </div>
+              </div>
+
+              <div class="toggles-row">
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <div class="tl">Destacado</div>
+                    <div class="ts">Aparece en "Lo más pedido"</div>
+                  </div>
+                  <label class="toggle">
+                    <input type="checkbox" id="fDestacado" checked>
+                    <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                  </label>
+                </div>
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <div class="tl">Agotado</div>
+                    <div class="ts">Se muestra sin stock en el menú</div>
+                  </div>
+                  <label class="toggle">
+                    <input type="checkbox" id="fAgotado">
+                    <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="edit-footer">
+                <button class="btn-ghost" onclick="showView('productsView')">Cancelar</button>
+                <button class="btn-save" onclick="saveProduct()">Guardar cambios</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GENERATOR TAB ══════════════════════════ -->
+  <div class="view" id="generatorTab">
+
+    <!-- Selection -->
+    <div id="genSelView" class="view active">
+      <div class="page">
+        <div class="gen-new-layout">
+
+          <!-- Left: steps -->
+          <div class="gen-steps-col">
+
+            <!-- Step 1: Platillo -->
+            <div class="gen-step-card">
+              <img class="gsc-thumb" id="gscThumb" src="" alt="">
+              <div class="gsc-body">
+                <div class="gsc-label">PASO 1 · PLATILLO</div>
+                <div class="gsc-name" id="gscName">—</div>
+                <div class="gsc-sub"  id="gscSub">—</div>
+              </div>
+              <select class="gsc-select" id="gscProdSelect" onchange="selProdNew(this.value)"></select>
+            </div>
+
+            <!-- Step 2: Tipo de pieza -->
+            <div class="gen-step-card">
+              <div class="gsc-icon" id="gscFmtIcon">IG</div>
+              <div class="gsc-body">
+                <div class="gsc-label">PASO 2 · TIPO DE PIEZA</div>
+                <div class="gsc-name" id="gscFmtName">Post cuadrado para Instagram</div>
+                <div class="gsc-sub"  id="gscFmtSub">1080 × 1080 · Foto + copy + hashtags</div>
+              </div>
+              <select class="gsc-select" id="gscFmtSelect" onchange="selFormatNew(this.value)">
+                <option value="square">Post cuadrado</option>
+                <option value="story">Historia</option>
+                <option value="landscape">Paisaje</option>
+                <option value="carousel">Carrusel</option>
+              </select>
+            </div>
+
+            <!-- Step 3: Mensaje -->
+            <div class="gen-step3">
+              <div class="gen-step3-label">PASO 3</div>
+              <div class="gen-step3-title">¿Qué querés decir?</div>
+              <div class="gen-step3-sub">Hablá natural. Si querés, dejalo en blanco y la IA inventa.</div>
+
+              <textarea class="gen-textarea" id="genDetail" rows="3"
+                placeholder="Ej: Promoción 3x1 hasta el 30 de mayo…"></textarea>
+
+              <!-- Tipo de post -->
+              <div class="gen-chip-row">
+                <button class="gen-type-chip sel" data-type="promo"       onclick="selTypeNew(this)">Promo</button>
+                <button class="gen-type-chip"     data-type="descuento"   onclick="selTypeNew(this)">Descuento</button>
+                <button class="gen-type-chip"     data-type="lanzamiento" onclick="selTypeNew(this)">Lanzamiento</button>
+                <button class="gen-type-chip"     data-type="temporada"   onclick="selTypeNew(this)">Temporada 🍂</button>
+              </div>
+
+              <!-- Tono -->
+              <div class="gen-chip-row">
+                <button class="gen-tone-chip sel" onclick="selToneNew(this)">Cálido</button>
+                <button class="gen-tone-chip"     onclick="selToneNew(this)">Cercano</button>
+                <button class="gen-tone-chip"     onclick="selToneNew(this)">Gourmet</button>
+                <button class="gen-tone-chip"     onclick="selToneNew(this)">Divertido 🔥</button>
+              </div>
+
+              <!-- Advanced -->
+              <div class="gen-adv-section">
+                <div class="gen-adv-lbl">Opciones avanzadas</div>
+                <div class="gen-adv-grid">
+                  <label class="gen-adv-item">
+                    <span>Incluir precio</span>
+                    <label class="toggle">
+                      <input type="checkbox" id="advPrecio" checked>
+                      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                    </label>
+                  </label>
+                  <label class="gen-adv-item">
+                    <span>Incluir CTA "reservar"</span>
+                    <label class="toggle">
+                      <input type="checkbox" id="advCta" checked>
+                      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                    </label>
+                  </label>
+                  <label class="gen-adv-item">
+                    <span>Generar 3 variaciones</span>
+                    <label class="toggle">
+                      <input type="checkbox" id="advVariaciones">
+                      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                    </label>
+                  </label>
+                  <label class="gen-adv-item">
+                    <span>Versión en inglés</span>
+                    <label class="toggle">
+                      <input type="checkbox" id="advEnglish">
+                      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                    </label>
+                  </label>
+                </div>
+              </div>
+
+              <button class="btn-generar" id="genBtn" onclick="startGenerate()">
+                ✦ Generar post
+              </button>
+            </div>
+          </div><!-- /gen-steps-col -->
+
+          <!-- Right: preview -->
+          <div class="gen-preview-col">
+            <div class="gen-preview-card">
+              <div class="gen-preview-hdr">VISTA PREVIA</div>
+              <div class="gen-preview-img-wrap" id="genPreviewImg">
+                <div class="gen-preview-gradient">
+                  <div class="gen-preview-sub" id="genPreviewSub">La IA va a componer el anuncio completo (foto + título + tag) con el texto integrado en la imagen.</div>
+                </div>
+              </div>
+              <div class="gen-preview-body" id="genPreviewBody">
+                Seleccioná un producto para ver la vista previa.
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /gen-new-layout -->
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loadingView">
+      <div class="loading-ring"></div>
+      <div class="loading-step" id="loadingStep">Analizando el producto…</div>
+      <div class="loading-sub">Generando contenido para <strong id="loadingProd">tu producto</strong></div>
+      <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+      <div class="loading-skeleton">
+        <div class="skel" style="aspect-ratio:1;border-radius:14px;"></div>
+        <div style="display:flex;flex-direction:column;gap:11px;padding-top:6px;">
+          <div class="skel" style="height:15px;width:55%;"></div>
+          <div class="skel" style="height:13px;width:100%;"></div>
+          <div class="skel" style="height:13px;width:90%;"></div>
+          <div class="skel" style="height:13px;width:76%;"></div>
+          <div class="skel" style="height:30px;width:58%;border-radius:20px;margin-top:6px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="resultView">
+      <div class="page">
+        <div class="result-header">
+          <div class="result-check">
+            <div class="check-icon">✓</div>
+            <div>
+              <div class="result-title">Tu post está listo</div>
+              <div class="result-crumbs" id="resultCrumbs">Promo · Alfajores</div>
+            </div>
+          </div>
+          <button class="restart-btn" onclick="restartGen()">Empezar de nuevo</button>
+        </div>
+
+        <div class="result-layout">
+          <!-- Promo card -->
+          <div class="promo-card-wrap">
+            <div class="promo-card" id="promoCard">
+              <div class="promo-card-bg" id="promoCardBg"></div>
+              <div class="promo-card-overlay"></div>
+              <div class="promo-card-top">
+                <span class="promo-card-cafename">Café Lúmina</span>
+                <span class="promo-card-badge" id="promoCardBadge">PROMO</span>
+              </div>
+              <div class="promo-card-bottom">
+                <div class="promo-card-pname" id="promoCardName">Alfajores</div>
+                <div id="promoCardDetail" style="font-size:12px;color:rgba(255,255,255,.8);font-weight:700;margin-bottom:6px;display:none;"></div>
+                <div class="promo-card-price-row">
+                  <span class="promo-card-price" id="promoCardPrice">$2.500</span>
+                  <span class="promo-card-cta" id="promoCardCta">Pedido en tu mesa o por QR</span>
+                </div>
+              </div>
+            </div>
+            <div class="download-row">
+              <button class="btn-download" onclick="downloadCard()">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Descargar imagen
+              </button>
+              <button class="btn-regen" onclick="regenCard()" title="Regenerar">↻</button>
+            </div>
+          </div>
+
+          <!-- Caption + IG preview -->
+          <div class="result-right">
+            <div class="caption-box">
+              <div class="caption-head">
+                <span class="caption-label">Caption sugerido</span>
+                <button class="btn-copy" onclick="copyCaption()">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                  Copiar
+                </button>
+              </div>
+              <div class="caption-text" id="captionText"></div>
+              <div class="caption-hashtags" id="captionHashtags"></div>
+            </div>
+
+            <div class="ig-preview">
+              <div class="ig-head">
+                <div class="ig-profile">
+                  <div class="ig-avatar">CL</div>
+                  <div>
+                    <div class="ig-username">cafe.lumina</div>
+                    <div class="ig-sub">Hace un momento</div>
+                  </div>
+                </div>
+                <div class="ig-dots">···</div>
+              </div>
+              <div class="ig-img-wrap">
+                <img id="igImg" src="" alt="" loading="lazy">
+              </div>
+              <div class="ig-actions">
+                <span class="ig-icon">🤍</span>
+                <span class="ig-icon">💬</span>
+                <span class="ig-icon">↗️</span>
+              </div>
+              <div class="ig-caption">
+                <strong>cafe.lumina</strong> <span id="igCaption"></span>
+              </div>
+            </div>
+
+            <button class="btn-copy-all" onclick="copyAll()">
+              📋 Copiar imagen + caption juntos
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /generatorTab -->
+
+  <!-- ══ BIBLIOTECA TAB ════════════════════════ -->
+  <div class="view" id="bibliotecaTab">
+    <div class="page">
+      <div class="bib-header">
+        <div class="bib-supertag">MI BIBLIOTECA</div>
+        <h1 class="bib-title"><span id="bibCount">0</span> piezas creadas</h1>
+      </div>
+      <div class="bib-filters">
+        <button class="bib-filter active" data-filter="all"       onclick="bibFilter('all')">
+          Todo <span class="bib-fcnt" id="bibCntAll">0</span>
+        </button>
+        <button class="bib-filter" data-filter="ig"              onclick="bibFilter('ig')">
+          Instagram <span class="bib-fcnt" id="bibCntIg">0</span>
+        </button>
+        <button class="bib-filter" data-filter="story"           onclick="bibFilter('story')">
+          Stories <span class="bib-fcnt" id="bibCntStory">0</span>
+        </button>
+        <button class="bib-filter" data-filter="publicado"       onclick="bibFilter('publicado')">
+          Publicados <span class="bib-fcnt" id="bibCntPub">0</span>
+        </button>
+      </div>
+      <div class="bib-grid" id="bibGrid"></div>
+    </div>
+  </div>
+
+  <!-- ══ SETTINGS TAB ══════════════════════════ -->
+  <div class="view" id="settingsTab">
+    <div class="page">
+      <div class="pview-head" style="margin-bottom:8px;">
+        <div>
+          <div class="pview-title">Configuración</div>
+          <div class="pview-sub">Personalizá el menú público y la contraseña del panel.</div>
+        </div>
+      </div>
+
+      <div class="settings-alert" id="convexAlert" style="display:none">
+        ⚠ <span>Convex no está configurado. Los cambios se aplican solo en esta sesión y no persisten. Completá <code>CONVEX_URL</code> en el código para guardar permanentemente.</span>
+      </div>
+
+      <!-- Identidad del café -->
+      <div class="settings-card">
+        <div class="settings-section-title">Identidad del café</div>
+        <div class="settings-grid">
+          <div class="field">
+            <label>Nombre (español)</label>
+            <input type="text" id="sBrandName" placeholder="Café Lúmina">
+          </div>
+          <div class="field">
+            <label>Name (English)</label>
+            <input type="text" id="sBrandNameEn" placeholder="Café Lúmina">
+          </div>
+          <div class="field">
+            <label>Dirección (español)</label>
+            <input type="text" id="sAddress" placeholder="Ej: Buenos Aires · Argentina">
+          </div>
+          <div class="field">
+            <label>Address (English)</label>
+            <input type="text" id="sAddressEn" placeholder="E.g.: Buenos Aires · Argentina">
+          </div>
+          <div class="field">
+            <label>Tagline (español)</label>
+            <input type="text" id="sTagline" placeholder="Café de especialidad · Panadería artesanal">
+          </div>
+          <div class="field">
+            <label>Tagline (English)</label>
+            <input type="text" id="sTaglineEn" placeholder="Specialty coffee · Artisan bakery">
+          </div>
+          <div class="field">
+            <label>Estado / Horario (español)</label>
+            <input type="text" id="sOpenText" placeholder="Abierto · cierra 20:00">
+          </div>
+          <div class="field">
+            <label>Status / Hours (English)</label>
+            <input type="text" id="sOpenTextEn" placeholder="Open · closes 8:00 PM">
+          </div>
+        </div>
+      </div>
+
+      <!-- Contraseña -->
+      <div class="settings-card">
+        <div class="settings-section-title">Contraseña del panel</div>
+        <div style="max-width:400px;display:flex;flex-direction:column;gap:14px;">
+          <div class="field">
+            <label>Contraseña actual</label>
+            <input type="password" id="sCurrentPw" placeholder="••••••••">
+          </div>
+          <div class="field">
+            <label>Nueva contraseña</label>
+            <input type="password" id="sNewPw" placeholder="Mínimo 4 caracteres">
+          </div>
+          <div class="field">
+            <label>Repetir nueva contraseña</label>
+            <input type="password" id="sNewPw2" placeholder="••••••••">
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px;">
+        <div id="settingsFeedback" style="font-size:13px;color:var(--oliva);align-self:center;"></div>
+        <button class="btn-save" onclick="saveSettings()">Guardar configuración</button>
+      </div>
+    </div>
+  </div><!-- /settingsTab -->
+
+  <script>
+  /* ══════════════════════════════════════════════
+     CONFIGURACIÓN CONVEX
+     Completá con tu URL de Convex cuando esté listo
+  ══════════════════════════════════════════════ */
+  const CONVEX_URL = 'http://127.0.0.1:3211'; // Local dev — reemplazar por la URL de producción al hacer deploy
+
+  /* ══════════════════════════════════════════════
+     SETTINGS (cargados desde Convex o defaults)
+  ══════════════════════════════════════════════ */
+  const SETTINGS = {
+    brandName:   'Café Lúmina',
+    brandNameEn: 'Café Lúmina',
+    address:     '',
+    addressEn:   '',
+    tagline:     'Café de especialidad · Panadería artesanal',
+    taglineEn:   'Specialty coffee · Artisan bakery',
+    openText:    'Abierto · cierra 20:00',
+    openTextEn:  'Open · closes 8:00 PM',
+    adminPassword: 'admin',
+  };
+
+  /* ══════════════════════════════════════════════
+     LOGIN / AUTH
+  ══════════════════════════════════════════════ */
+  function checkAuth() {
+    if (!sessionStorage.getItem('adminAuth')) {
+      document.getElementById('loginOverlay').classList.remove('hidden');
+    } else {
+      document.getElementById('loginOverlay').classList.add('hidden');
+    }
+  }
+
+  async function doLogin() {
+    const pw  = document.getElementById('loginInput').value;
+    const err = document.getElementById('loginError');
+    if (!pw) { err.textContent = 'Ingresá la contraseña'; return; }
+
+    let ok = false;
+    if (CONVEX_URL) {
+      try {
+        const res  = await fetch(`${CONVEX_URL}/api/auth`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: pw })
+        });
+        const data = await res.json();
+        ok = data.ok;
+      } catch(e) {
+        ok = (pw === SETTINGS.adminPassword);
+      }
+    } else {
+      ok = (pw === SETTINGS.adminPassword);
+    }
+
+    if (ok) {
+      sessionStorage.setItem('adminAuth', '1');
+      const overlay = document.getElementById('loginOverlay');
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.classList.add('hidden'), 300);
+      err.textContent = '';
+    } else {
+      err.textContent = 'Contraseña incorrecta. Intentá de nuevo.';
+      const input = document.getElementById('loginInput');
+      input.style.borderColor = '#B14B2E';
+      setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    }
+  }
+
+  function doLogout() {
+    if (!confirm('¿Cerrar sesión del panel?')) return;
+    sessionStorage.removeItem('adminAuth');
+    checkAuth();
+  }
+
+  /* ══════════════════════════════════════════════
+     SETTINGS LOAD / SAVE
+  ══════════════════════════════════════════════ */
+  async function loadSettings() {
+    if (CONVEX_URL) {
+      try {
+        const res  = await fetch(`${CONVEX_URL}/api/settings`);
+        const data = await res.json();
+        Object.keys(SETTINGS).forEach(k => { if (data[k]) SETTINGS[k] = data[k]; });
+      } catch(e) { /* use defaults */ }
+    }
+    // Update brand in nav
+    document.getElementById('loginBrand').textContent = SETTINGS.brandName;
+    document.querySelector('.brand').textContent = SETTINGS.brandName;
+  }
+
+  function populateSettingsForm() {
+    document.getElementById('sBrandName').value   = SETTINGS.brandName;
+    document.getElementById('sBrandNameEn').value = SETTINGS.brandNameEn;
+    document.getElementById('sAddress').value     = SETTINGS.address;
+    document.getElementById('sAddressEn').value   = SETTINGS.addressEn;
+    document.getElementById('sTagline').value     = SETTINGS.tagline;
+    document.getElementById('sTaglineEn').value   = SETTINGS.taglineEn;
+    document.getElementById('sOpenText').value    = SETTINGS.openText;
+    document.getElementById('sOpenTextEn').value  = SETTINGS.openTextEn;
+    if (!CONVEX_URL) document.getElementById('convexAlert').style.display = 'flex';
+  }
+
+  async function saveSettings() {
+    const newPw  = document.getElementById('sNewPw').value;
+    const newPw2 = document.getElementById('sNewPw2').value;
+    const curPw  = document.getElementById('sCurrentPw').value;
+    const fb     = document.getElementById('settingsFeedback');
+
+    if (newPw && newPw !== newPw2) { fb.textContent = '❌ Las contraseñas no coinciden'; fb.style.color = 'var(--terracota)'; return; }
+    if (newPw && newPw.length < 4) { fb.textContent = '❌ Mínimo 4 caracteres'; fb.style.color = 'var(--terracota)'; return; }
+
+    const updates = [
+      { key: 'brandName',   value: document.getElementById('sBrandName').value   || SETTINGS.brandName },
+      { key: 'brandNameEn', value: document.getElementById('sBrandNameEn').value || SETTINGS.brandNameEn },
+      { key: 'address',     value: document.getElementById('sAddress').value     },
+      { key: 'addressEn',   value: document.getElementById('sAddressEn').value   },
+      { key: 'tagline',     value: document.getElementById('sTagline').value     || SETTINGS.tagline },
+      { key: 'taglineEn',   value: document.getElementById('sTaglineEn').value   || SETTINGS.taglineEn },
+      { key: 'openText',    value: document.getElementById('sOpenText').value    || SETTINGS.openText },
+      { key: 'openTextEn',  value: document.getElementById('sOpenTextEn').value  || SETTINGS.openTextEn },
+    ];
+    if (newPw) updates.push({ key: 'adminPassword', value: newPw });
+
+    // Update SETTINGS in memory
+    updates.forEach(({ key, value }) => { SETTINGS[key] = value; });
+
+    if (CONVEX_URL) {
+      const pw = curPw || SETTINGS.adminPassword;
+      try {
+        const res = await fetch(`${CONVEX_URL}/api/settings`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ settings: updates, password: pw })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'Error');
+        fb.textContent = '✓ Guardado en Convex';
+      } catch(e) {
+        fb.textContent = '❌ Error: ' + e.message;
+        fb.style.color = 'var(--terracota)';
+        return;
+      }
+    } else {
+      fb.textContent = '✓ Aplicado en esta sesión (sin persistencia)';
+    }
+
+    fb.style.color = 'var(--oliva)';
+    document.querySelector('.brand').textContent = SETTINGS.brandName;
+    if (newPw) { document.getElementById('sCurrentPw').value = ''; document.getElementById('sNewPw').value = ''; document.getElementById('sNewPw2').value = ''; }
+    setTimeout(() => { fb.textContent = ''; }, 3500);
+  }
+
+  /* ══════════════════════════════════════════════
+     SUPABASE / IMAGE CONFIG
+  ══════════════════════════════════════════════ */
+  const IMG = {
+    enabled: false,
+    url: 'https://TU-PROYECTO.supabase.co',
+    bucket: 'productos',
+    get(id, kw, lock, w, h) {
+      if (this.enabled) return `${this.url}/storage/v1/object/public/${this.bucket}/${id}.jpg`;
+      return `https://loremflickr.com/${w}/${h}/${encodeURIComponent(kw)}?lock=${lock}`;
+    }
+  };
+
+  /* ══════════════════════════════════════════════
+     DATA
+  ══════════════════════════════════════════════ */
+  const PRODUCTS = [
+    { id: 1, slug: 'latte',       name: 'Latte de autor',                   cat: 'Cafés Especiales', price: '$5.000',  kw: 'latte,art',          lock: 201, desc: 'Base de latte combinada con la salsa de tu elección', variants: ['Pistacho','Caramelo','Vainilla','Chocolate','Dulce de leche'], destacado: true,  agotado: false },
+    { id: 2, slug: 'avocado',     name: 'Avocado Toast',                    cat: 'Panadería',         price: '$7.500',  kw: 'avocado,toast',      lock: 202, desc: 'Queso crema, palta y huevos revueltos',               variants: [],                                                              destacado: true,  agotado: false },
+    { id: 3, slug: 'alfajores',   name: 'Alfajores',                        cat: 'Pastelería',        price: '$2.500',  kw: 'cookie,dessert',     lock: 203, desc: 'Artesanales, 5 sabores disponibles',                  variants: ['Nutella','Pistacho','Maizena','Rogel','Almendras'],             destacado: true,  agotado: false },
+    { id: 4, slug: 'cafe-chico',  name: 'Café chico',                       cat: 'Cafés',             price: '$2.000',  kw: 'espresso,coffee',    lock: 204, desc: '',                                                    variants: [],                                                              destacado: false, agotado: false },
+    { id: 5, slug: 'promo1',      name: 'Promo 1 · Infusión + 2 medialunas',cat: 'Promos',            price: '$3.500',  kw: 'coffee,croissant',   lock: 205, desc: 'Infusión a elección + 2 medialunas',                 variants: [],                                                              destacado: true,  agotado: false },
+    { id: 6, slug: 'medialunas',  name: 'Medialunas',                       cat: 'Panadería',         price: '$900',    kw: 'croissant',          lock: 206, desc: '',                                                    variants: [],                                                              destacado: false, agotado: false },
+    { id: 7, slug: 'nesquik',     name: 'Nesquik',                          cat: 'Bebidas',           price: '$2.000',  kw: 'chocolate,milk',     lock: 207, desc: '',                                                    variants: [],                                                              destacado: false, agotado: true  },
+    { id: 8, slug: 'tortas',      name: 'Tortas (porción)',                 cat: 'Pastelería',        price: '$3.000',  kw: 'cake,slice',         lock: 208, desc: 'Degustación que varía cada semana',                  variants: [],                                                              destacado: false, agotado: false },
+    { id: 9, slug: 'roll',        name: 'Roll de canela',                   cat: 'Panadería',         price: '$4.000',  kw: 'cinnamon,roll',      lock: 209, desc: '',                                                    variants: [],                                                              destacado: false, agotado: false },
+    { id: 10, slug: 'brownies',   name: 'Brownies',                         cat: 'Pastelería',        price: '$3.000',  kw: 'brownie,chocolate',  lock: 210, desc: '',                                                    variants: ['Oreo','Nueces'],                                                destacado: false, agotado: false },
+  ];
+
+  const CAPTIONS = {
+    promo: (p) => ({
+      text: `Hoy se siente a ${p.name.toLowerCase()} recién hecho 🤎 Llevátelo por ${p.price} y hacé que tu pausa valga la pena. Te esperamos en Café Lúmina.`,
+      tags: '#CaféLúmina #CaféDeEspecialidad #HechoConTiempo #' + p.name.split(' ')[0].replace(/[^A-Za-zÁÉÍÓÚáéíóúñ]/g,'')
+    }),
+    descuento: (p) => ({
+      text: `Solo por hoy: ${p.name} con 20% OFF 🤎 De ${p.price} a ese precio especial. Pasá, que el café no espera.`,
+      tags: '#CaféLúmina #Descuento #OfertaDelDía #' + p.name.split(' ')[0].replace(/[^A-Za-zÁÉÍÓÚáéíóúñ]/g,'')
+    }),
+    lanzamiento: (p) => ({
+      text: `Nuevo en la carta: ${p.name} ✨ ${p.desc || 'Hecho con tiempo y buenos ingredientes.'} Ya disponible en Café Lúmina.`,
+      tags: '#CaféLúmina #NuevoEnCarta #HechoConTiempo #' + p.name.split(' ')[0].replace(/[^A-Za-zÁÉÍÓÚáéíóúñ]/g,'')
+    }),
+    temporada: (p) => ({
+      text: `Llegó la temporada y con ella nuestro ${p.name} 🍂 ${p.price}. La excusa perfecta para quedarte un rato más en Café Lúmina.`,
+      tags: '#CaféLúmina #DeTemporda #SaborDeEstación #' + p.name.split(' ')[0].replace(/[^A-Za-zÁÉÍÓÚáéíóúñ]/g,'')
+    })
+  };
+
+  /* ══ State ═══════════════════════════════════ */
+  let selectedProduct = PRODUCTS[2];
+  let selectedType    = 'promo';
+  let selectedFormat  = 'square';
+  let editingId       = null;
+  let currentVariants = [];
+
+  /* ══ Tab switching ═══════════════════════════ */
+  function showTab(tab) {
+    document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view[id$="Tab"]').forEach(v => v.classList.remove('active'));
+    const tabEl = document.querySelector(`.nav-tab[onclick="showTab('${tab}')"]`);
+    if (tabEl) tabEl.classList.add('active');
+    const map = { dashboard:'dashboardTab', products:'productsTab', generator:'generatorTab', biblioteca:'bibliotecaTab', settings:'settingsTab' };
+    document.getElementById(map[tab] || 'dashboardTab').classList.add('active');
+    if (tab === 'generator')  buildProdSelectNew();
+    if (tab === 'biblioteca') renderLibrary();
+    if (tab === 'settings')   populateSettingsForm();
+  }
+
+  function showView(id) {
+    const parent = document.getElementById('productsTab');
+    parent.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  /* ══ Products table ══════════════════════════ */
+  function renderProducts(list) {
+    const body = document.getElementById('productsTableBody');
+    body.innerHTML = list.map(p => {
+      const stateCls  = p.agotado ? 'state-agotado' : p.destacado ? 'state-destacado' : 'state-disponible';
+      const stateText = p.agotado ? '● Agotado'     : p.destacado ? '★ Destacado'     : '● Disponible';
+      return `
+        <div class="ptable-row" id="prow-${p.id}">
+          <div class="row-product">
+            <img class="row-thumb" src="${IMG.get(p.slug, p.kw, p.lock, 92, 92)}" alt="" loading="lazy">
+            <div>
+              <div class="row-name">${p.name}</div>
+              <div class="row-cat">${p.cat}</div>
+            </div>
+          </div>
+          <div class="row-price">${p.price}</div>
+          <div><span class="state-pill ${stateCls}">${stateText}</span></div>
+          <div class="row-actions">
+            <button class="act-btn" title="Editar" onclick="showEdit(${p.id})">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="act-btn ${p.destacado ? 'star-on' : ''}" title="Destacar" onclick="toggleDestacado(${p.id})">★</button>
+            <button class="act-btn ${p.agotado ? 'agotado-on' : ''}" title="Marcar agotado" onclick="toggleAgotado(${p.id})">⊘</button>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function filterProducts(q) {
+    const filtered = q ? PRODUCTS.filter(p => p.name.toLowerCase().includes(q.toLowerCase()) || p.cat.toLowerCase().includes(q.toLowerCase())) : PRODUCTS;
+    renderProducts(filtered);
+  }
+
+  function toggleDestacado(id) {
+    const p = PRODUCTS.find(x => x.id === id);
+    if (p) { p.destacado = !p.destacado; renderProducts(PRODUCTS); }
+  }
+
+  function toggleAgotado(id) {
+    const p = PRODUCTS.find(x => x.id === id);
+    if (p) { p.agotado = !p.agotado; p.destacado = p.agotado ? false : p.destacado; renderProducts(PRODUCTS); }
+  }
+
+  /* ══ Edit product ════════════════════════════ */
+  function showEdit(id) {
+    editingId = id;
+    const p = id ? PRODUCTS.find(x => x.id === id) : null;
+    document.getElementById('editTitle').textContent = p ? 'Editar producto' : 'Nuevo producto';
+    document.getElementById('editPhoto').src    = p ? IMG.get(p.slug, p.kw, p.lock, 300, 300) : IMG.get('default', 'coffee,cup', 1, 300, 300);
+    document.getElementById('fNombre').value    = p ? p.name  : '';
+    document.getElementById('fPrecio').value    = p ? p.price : '';
+    document.getElementById('fDesc').value      = p ? p.desc  : '';
+    document.getElementById('fDestacado').checked = p ? p.destacado : false;
+    document.getElementById('fAgotado').checked   = p ? p.agotado   : false;
+    const catSel = document.getElementById('fCategoria');
+    if (p) catSel.value = p.cat;
+    currentVariants = p ? [...p.variants] : [];
+    renderVariantTags();
+    showView('editView');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderVariantTags() {
+    const wrap = document.getElementById('tagsWrap');
+    wrap.innerHTML = currentVariants.map((v, i) => `
+      <span class="tag">${v} <button class="tag-x" onclick="removeVariant(${i})">×</button></span>
+    `).join('') + `<button class="tag-add" onclick="addVariant()">+ Agregar variante</button>`;
+  }
+
+  function removeVariant(i) {
+    currentVariants.splice(i, 1);
+    renderVariantTags();
+  }
+
+  function addVariant() {
+    const name = prompt('Nombre de la variante:');
+    if (name && name.trim()) {
+      currentVariants.push(name.trim());
+      renderVariantTags();
+    }
+  }
+
+  function saveProduct() {
+    if (editingId) {
+      const p = PRODUCTS.find(x => x.id === editingId);
+      if (p) {
+        p.name      = document.getElementById('fNombre').value;
+        p.price     = document.getElementById('fPrecio').value;
+        p.cat       = document.getElementById('fCategoria').value;
+        p.desc      = document.getElementById('fDesc').value;
+        p.destacado = document.getElementById('fDestacado').checked;
+        p.agotado   = document.getElementById('fAgotado').checked;
+        p.variants  = [...currentVariants];
+      }
+    }
+    renderProducts(PRODUCTS);
+    showView('productsView');
+  }
+
+  /* ══ Generator — new UI ══════════════════════ */
+  const FORMAT_INFO = {
+    square:    { icon: 'IG', name: 'Post cuadrado para Instagram', sub: '1080 × 1080 · Foto + copy + hashtags' },
+    story:     { icon: 'ST', name: 'Historia de Instagram',        sub: '1080 × 1920 · Vertical · Stories' },
+    landscape: { icon: 'FB', name: 'Post horizontal',              sub: '1080 × 566 · Facebook · LinkedIn' },
+    carousel:  { icon: '↻',  name: 'Carrusel de Instagram',        sub: 'Múltiples slides · Mayor alcance' },
+  };
+
+  function buildProdSelectNew() {
+    const sel = document.getElementById('gscProdSelect');
+    if (!sel) return;
+    sel.innerHTML = PRODUCTS.map(p =>
+      `<option value="${p.id}" ${p.id === selectedProduct.id ? 'selected' : ''}>${p.name}</option>`
+    ).join('');
+    selProdNew(selectedProduct.id);
+    selFormatNew(selectedFormat);
+  }
+
+  function selProdNew(id) {
+    selectedProduct = PRODUCTS.find(p => p.id === parseInt(id)) || PRODUCTS[0];
+    const thumb = IMG.get(selectedProduct.slug, selectedProduct.kw, selectedProduct.lock, 100, 100);
+    const big   = IMG.get(selectedProduct.slug, selectedProduct.kw, selectedProduct.lock, 400, 400);
+    const th = document.getElementById('gscThumb');
+    const nm = document.getElementById('gscName');
+    const sb = document.getElementById('gscSub');
+    if (th) th.src = thumb;
+    if (nm) nm.textContent = selectedProduct.name;
+    if (sb) sb.textContent = `${selectedProduct.cat} · ${selectedProduct.price}`;
+    const pi = document.getElementById('genPreviewImg');
+    const pb = document.getElementById('genPreviewBody');
+    if (pi) pi.style.backgroundImage = `url('${big}')`;
+    if (pb) pb.textContent = selectedProduct.desc || `${selectedProduct.cat} · ${selectedProduct.price}`;
+  }
+
+  function selFormatNew(val) {
+    selectedFormat = val;
+    const info = FORMAT_INFO[val] || FORMAT_INFO.square;
+    const fi = document.getElementById('gscFmtIcon');
+    const fn = document.getElementById('gscFmtName');
+    const fs = document.getElementById('gscFmtSub');
+    if (fi) fi.textContent = info.icon;
+    if (fn) fn.textContent = info.name;
+    if (fs) fs.textContent = info.sub;
+    const pi = document.getElementById('genPreviewImg');
+    if (pi) {
+      const ar = { square:'1/1', story:'9/16', landscape:'16/9', carousel:'1/1' };
+      pi.style.aspectRatio = ar[val] || '1/1';
+    }
+  }
+
+  function selTypeNew(el) {
+    document.querySelectorAll('.gen-type-chip').forEach(e => e.classList.remove('sel'));
+    el.classList.add('sel');
+    selectedType = el.dataset.type;
+  }
+
+  function selToneNew(el) {
+    document.querySelectorAll('.gen-tone-chip').forEach(e => e.classList.remove('sel'));
+    el.classList.add('sel');
+  }
+
+  function getAdvOptions() {
+    return {
+      precio:      document.getElementById('advPrecio')?.checked     ?? true,
+      cta:         document.getElementById('advCta')?.checked        ?? true,
+      variaciones: document.getElementById('advVariaciones')?.checked ?? false,
+      english:     document.getElementById('advEnglish')?.checked    ?? false,
+    };
+  }
+
+  /* ══ Dashboard ═══════════════════════════════ */
+  function initDashboard() {
+    const now  = new Date();
+    const h    = now.getHours();
+    const sal  = h < 12 ? 'Buenos días' : h < 19 ? 'Buenas tardes' : 'Buenas noches';
+    const days = ['DOMINGO','LUNES','MARTES','MIÉRCOLES','JUEVES','VIERNES','SÁBADO'];
+    const mons = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+    document.getElementById('dashDate').textContent = `${days[now.getDay()]}, ${now.getDate()} DE ${mons[now.getMonth()]} ${now.getFullYear()}`;
+    document.getElementById('dashGreeting').innerHTML = `${sal}, <span class="dash-name">${SETTINGS.brandName}</span>`;
+
+    const views = (Math.floor(Math.random() * 1200 + 600));
+    document.getElementById('dashViews').textContent  = views.toLocaleString('es-AR');
+    document.getElementById('statViews').textContent  = views.toLocaleString('es-AR');
+
+    const top = PRODUCTS.find(p => p.destacado) || PRODUCTS[0];
+    document.getElementById('statTop').textContent = top.name;
+
+    const genCount = parseInt(localStorage.getItem('genCount') || '0');
+    document.getElementById('statContent').textContent = genCount;
+
+    document.getElementById('statProds').textContent = PRODUCTS.length;
+    const agotados = PRODUCTS.filter(p => p.agotado).length;
+    document.getElementById('statProdsSub').textContent = agotados > 0 ? `${agotados} agotado${agotados>1?'s':''}` : 'todos disponibles';
+
+    const feats = PRODUCTS.filter(p => p.destacado);
+    const sug   = feats[Math.floor(Math.random() * feats.length)] || PRODUCTS[0];
+    document.getElementById('sugTitle').textContent = `¿Ya generaste contenido de ${sug.name}?`;
+    document.getElementById('sugDesc').textContent  = `Es uno de tus productos más populares. Un post bien hecho puede traerte más pedidos esta semana.`;
+  }
+
+  const LOAD_STEPS = [
+    'Analizando tu producto…',
+    'Eligiendo la mejor toma…',
+    'Escribiendo el caption…',
+    'Ajustando los colores de marca…',
+    'Puliendo los detalles…',
+  ];
+
+  let _aiResult = null;
+
+  function startGenerate() {
+    if (!selectedProduct) { alert('Seleccioná un producto primero'); return; }
+
+    const cnt = parseInt(localStorage.getItem('genCount') || '0') + 1;
+    localStorage.setItem('genCount', cnt);
+
+    document.getElementById('genSelView').classList.remove('active');
+    const lv = document.getElementById('loadingView');
+    lv.classList.add('active');
+    lv.style.display = 'flex';
+
+    const prodEl = document.getElementById('loadingProd');
+    if (prodEl) prodEl.textContent = selectedProduct.name;
+
+    let step = 0;
+    const stepEl = document.getElementById('loadingStep');
+    const barEl  = document.getElementById('loadingBar');
+    stepEl.textContent = LOAD_STEPS[0];
+    if (barEl) barEl.style.width = '10%';
+
+    // Animar pasos mientras esperamos la IA (más lento que la simulación)
+    const progressSteps = ['10%','28%','48%','66%','82%'];
+    const interval = setInterval(() => {
+      step++;
+      if (step < LOAD_STEPS.length) {
+        stepEl.textContent = LOAD_STEPS[step];
+        if (barEl) barEl.style.width = progressSteps[step] || '82%';
+      }
+    }, 1800);
+
+    const tone   = document.querySelector('.gen-tone-chip.sel')?.textContent?.replace(/\s*🔥/,'').trim() || 'Cálido';
+    const detail = document.getElementById('genDetail').value.trim();
+    const advOpts = getAdvOptions();
+
+    fetch(`${CONVEX_URL}/api/generate`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        product:   selectedProduct,
+        type:      selectedType,
+        tone,
+        detail,
+        format:    selectedFormat,
+        options:   advOpts,
+        brandName: SETTINGS.brandName,
+      }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      clearInterval(interval);
+      if (barEl) barEl.style.width = '100%';
+      _aiResult = data.ok ? data : null;
+      setTimeout(() => showResult(0), 500);
+    })
+    .catch(() => {
+      clearInterval(interval);
+      if (barEl) barEl.style.width = '100%';
+      _aiResult = null;
+      setTimeout(() => showResult(0), 500);
+    });
+  }
+
+  function showResult(variant) {
+    const lv = document.getElementById('loadingView');
+    lv.classList.remove('active');
+    lv.style.display = 'none';
+
+    const p        = selectedProduct;
+    const typeMap  = { promo: 'Promo', descuento: 'Descuento', lanzamiento: 'Lanzamiento', temporada: 'Temporada' };
+    const badgeMap = { promo: 'PROMO', descuento: '-20% OFF', lanzamiento: 'NUEVO', temporada: 'DE TEMPORADA' };
+    const advOpts  = getAdvOptions();
+    const detail   = document.getElementById('genDetail').value.trim();
+
+    // Usar resultado de IA si está disponible, si no fallback a simulación
+    const aiCap  = _aiResult?.caption;
+    const cap    = aiCap || CAPTIONS[selectedType](p);
+    const v      = variant || 0;
+    const imgUrl = _aiResult?.imageUrl || IMG.get(p.slug, p.kw, p.lock + 500 + v, 600, 600);
+
+    // Formato → aspect-ratio del card
+    const arMap = { square: '1 / 1', story: '9 / 16', landscape: '16 / 9', carousel: '1 / 1' };
+    document.getElementById('promoCard').style.aspectRatio = arMap[selectedFormat] || '1 / 1';
+
+    document.getElementById('resultCrumbs').textContent = `${typeMap[selectedType]} · ${p.name} · ${selectedFormat === 'square' ? 'Post' : selectedFormat === 'story' ? 'Historia' : selectedFormat === 'landscape' ? 'Paisaje' : 'Carrusel'}`;
+    document.getElementById('promoCardBg').style.backgroundImage = `url('${imgUrl}')`;
+    document.getElementById('promoCardBadge').textContent = badgeMap[selectedType];
+    document.getElementById('promoCardName').textContent  = p.name;
+
+    // Texto sobre imagen (detail input)
+    const detailEl = document.getElementById('promoCardDetail');
+    detailEl.textContent = detail;
+    detailEl.style.display = detail ? 'block' : 'none';
+
+    // Opciones avanzadas → precio y CTA
+    document.getElementById('promoCardPrice').style.display = advOpts.precio ? '' : 'none';
+    document.getElementById('promoCardCta').style.display   = advOpts.cta ? '' : 'none';
+    document.getElementById('promoCardPrice').textContent   = p.price;
+
+    // Caption — si versión inglés la marcamos en el tag
+    const captionText = advOpts.english
+      ? `Today only: ${p.name} 🤎 ${p.price}. Come visit us at ${SETTINGS.brandNameEn || SETTINGS.brandName}.`
+      : cap.text;
+    document.getElementById('captionText').textContent     = captionText;
+    document.getElementById('captionHashtags').textContent = cap.tags;
+    document.getElementById('igImg').src = imgUrl;
+    document.getElementById('igCaption').textContent = captionText + ' ' + cap.tags;
+
+    const rv = document.getElementById('resultView');
+    rv.classList.add('active');
+    rv.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Guardar en biblioteca
+    saveToLibrary({
+      id: Date.now().toString(),
+      productName: p.name,
+      productSlug: p.slug,
+      format: selectedFormat,
+      type: selectedType,
+      imageUrl: imgUrl,
+      caption: captionText,
+      hashtags: cap.tags,
+      status: 'listo',
+      createdAt: new Date().toISOString(),
+    });
+  }
+
+  function restartGen() {
+    document.getElementById('resultView').classList.remove('active');
+    document.getElementById('resultView').style.display = 'none';
+    document.getElementById('genSelView').classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  let _regenVariant = 0;
+  function regenCard() {
+    _regenVariant = (_regenVariant + 1) % 3;
+    document.getElementById('resultView').classList.remove('active');
+    document.getElementById('resultView').style.display = 'none';
+    const lv = document.getElementById('loadingView');
+    lv.style.display = 'flex';
+    lv.classList.add('active');
+    const stepEl = document.getElementById('loadingStep');
+    const barEl  = document.getElementById('loadingBar');
+    const prodEl = document.getElementById('loadingProd');
+    if (stepEl) stepEl.textContent = 'Regenerando variante…';
+    if (barEl) barEl.style.width = '20%';
+    if (prodEl) prodEl.textContent = selectedProduct.name;
+    setTimeout(() => { if (barEl) barEl.style.width = '80%'; }, 400);
+    setTimeout(() => { if (barEl) barEl.style.width = '100%'; }, 1400);
+    setTimeout(() => { showResult(_regenVariant); }, 1800);
+  }
+
+  function copyCaption() {
+    const text = document.getElementById('captionText').textContent + '\n' + document.getElementById('captionHashtags').textContent;
+    navigator.clipboard?.writeText(text).catch(() => {});
+    const btn = event.currentTarget;
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => btn.innerHTML = '<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copiar', 2000);
+  }
+
+  function copyAll() {
+    const text = document.getElementById('captionText').textContent + '\n' + document.getElementById('captionHashtags').textContent;
+    navigator.clipboard?.writeText(text).catch(() => {});
+    const btn = event.currentTarget;
+    btn.textContent = '✓ ¡Copiado al portapapeles!';
+    setTimeout(() => { btn.innerHTML = '📋 Copiar imagen + caption juntos'; }, 2500);
+  }
+
+  function downloadCard() {
+    alert('En producción, esta función descarga la imagen generada por IA como archivo PNG listo para publicar.');
+  }
+
+  /* ══ Biblioteca ══════════════════════════════ */
+  const FORMAT_LABEL = { square:'Instagram 1:1', story:'Story 9:16', landscape:'Paisaje 16:9', carousel:'Carrusel' };
+
+  function loadLibrary() {
+    return JSON.parse(localStorage.getItem('lumina_library') || '[]');
+  }
+
+  function saveToLibrary(item) {
+    const lib = loadLibrary();
+    lib.unshift(item);
+    localStorage.setItem('lumina_library', JSON.stringify(lib.slice(0, 50)));
+  }
+
+  function timeAgo(iso) {
+    const sec = Math.floor((Date.now() - new Date(iso)) / 1000);
+    if (sec < 60)    return 'Ahora mismo';
+    if (sec < 3600)  return `Hace ${Math.floor(sec/60)} min`;
+    if (sec < 86400) return `Hace ${Math.floor(sec/3600)}h`;
+    return `Hace ${Math.floor(sec/86400)} día${Math.floor(sec/86400) > 1 ? 's' : ''}`;
+  }
+
+  let _bibFilter = 'all';
+
+  function bibFilter(filter) {
+    _bibFilter = filter;
+    document.querySelectorAll('.bib-filter').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+    renderLibrary();
+  }
+
+  function renderLibrary() {
+    const lib = loadLibrary();
+    const filtered = lib.filter(i => {
+      if (_bibFilter === 'ig')       return i.format !== 'story';
+      if (_bibFilter === 'story')    return i.format === 'story';
+      if (_bibFilter === 'publicado') return i.status === 'publicado';
+      return true;
+    });
+
+    const c = { all: lib.length, ig: lib.filter(i=>i.format!=='story').length,
+                story: lib.filter(i=>i.format==='story').length, pub: lib.filter(i=>i.status==='publicado').length };
+    const cnt = document.getElementById('bibCount');
+    if (cnt) cnt.textContent = lib.length;
+    ['All','Ig','Story','Pub'].forEach((k,i)=>{
+      const el = document.getElementById('bibCnt'+k);
+      if (el) el.textContent = Object.values(c)[i];
+    });
+
+    const grid = document.getElementById('bibGrid');
+    if (!grid) return;
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div class="bib-empty">
+        <div class="bib-empty-icon">📷</div>
+        <div class="bib-empty-title">Todavía no hay piezas${_bibFilter !== 'all' ? ' en este filtro' : ''}</div>
+        <div class="bib-empty-sub">${_bibFilter === 'all' ? 'Generá tu primer post y aparecerá acá.' : 'Probá con otro filtro.'}</div>
+      </div>`;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(item => {
+      const imgStyle  = item.imageUrl ? `background-image:url('${item.imageUrl}')` : '';
+      const fmtLabel  = FORMAT_LABEL[item.format] || item.format;
+      const isStory   = item.format === 'story';
+      const statusCls = item.status === 'publicado' ? 'bib-status-publicado' : 'bib-status-listo';
+      const statusTxt = item.status === 'publicado' ? 'PUBLICADO' : 'LISTO';
+      const titleTxt  = (item.caption || item.productName || '').split(/[.!?]/)[0].trim().slice(0, 38) || item.productName;
+      return `<div class="bib-item">
+        <div class="bib-img${isStory?' story':''}" style="${imgStyle}">
+          <div class="bib-badges">
+            <span class="bib-fmt">${fmtLabel}</span>
+            <span class="bib-status ${statusCls}">${statusTxt}</span>
+          </div>
+          <div class="bib-title-overlay">${titleTxt}</div>
+        </div>
+        <div class="bib-footer">
+          <div style="min-width:0">
+            <div class="bib-iname">${item.productName}</div>
+            <div class="bib-itime">${timeAgo(item.createdAt)}</div>
+          </div>
+          <div class="bib-iacts">
+            <button class="bib-act" title="Descargar" onclick="bibDownload('${item.id}')">⬇</button>
+            <button class="bib-act" title="Opciones"  onclick="bibMore('${item.id}')">···</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function bibDownload(id) {
+    const item = loadLibrary().find(i => i.id === id);
+    if (!item?.imageUrl) { alert('No hay imagen disponible para descargar.'); return; }
+    const a = document.createElement('a');
+    a.href = item.imageUrl; a.target = '_blank';
+    a.download = `lumina-${(item.productName||'post').replace(/\s+/g,'-')}-${item.format}.webp`;
+    a.click();
+  }
+
+  function bibMore(id) {
+    const lib  = loadLibrary();
+    const item = lib.find(i => i.id === id);
+    if (!item) return;
+    const action = confirm(`"${item.productName}"\n\nOpciones:\n· OK = marcar como publicado\n· Cancelar = eliminar`);
+    if (action) {
+      item.status = 'publicado';
+    } else {
+      const sure = confirm('¿Eliminar esta pieza?');
+      if (!sure) return;
+      const idx = lib.findIndex(i => i.id === id);
+      lib.splice(idx, 1);
+    }
+    localStorage.setItem('lumina_library', JSON.stringify(lib));
+    renderLibrary();
+  }
+
+  /* ══ Init ═══════════════════════════════════ */
+  (async () => {
+    await loadSettings();
+    checkAuth();
+    renderProducts(PRODUCTS);
+    initDashboard();
+  })();
+  </script>
+</body>
+</html>

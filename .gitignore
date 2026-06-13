@@ -1,0 +1,11 @@
+
+.env.local
+.env*.local
+node_modules/
+lumina-video/
+convex/_generated/
+.convex/
+dist/
+*.mp4
+*.mp3
+*.wav
